@@ -1,0 +1,216 @@
+ <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect+ | Conversas inteligentes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">C+</div>
+                <div>
+                    <h1>Connect<span>+</span></h1>
+                    <small>Conectando conversas a ações</small>
+                </div>
+            </div>
+
+
+            <button class="new-chat" id="novoChat">＋ Nova conversa</button>
+
+
+            <div class="sidebar-title">MENU</div>
+
+
+            <button class="menu-item active" data-view="chat">
+                <span>💬</span> Conversas
+            </button>
+            <button class="menu-item" data-view="tarefas">
+                <span>✓</span> Minhas tarefas
+                <span class="counter" id="contadorTarefas">0</span>
+            </button>
+            <button class="menu-item" data-view="eventos">
+                <span>📅</span> Eventos
+            </button>
+            <button class="menu-item" data-view="enquetes">
+                <span>📊</span> Enquetes
+            </button>
+            <button class="menu-item" data-view="memoria">
+                <span>🧠</span> Memória inteligente
+            </button>
+
+
+            <div class="sidebar-title">CONVERSAS</div>
+            <div class="chat-list" id="listaConversas"></div>
+
+
+            <div class="profile">
+                <div class="avatar user-avatar">M</div>
+                <div>
+                    <strong>Maria</strong>
+                    <small>Minha conta</small>
+                </div>
+            </div>
+        </aside>
+
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <h2 id="tituloPagina">Conversas</h2>
+                    <p id="subtituloPagina">Converse e organize sua rotina.</p>
+                </div>
+                <div class="top-actions">
+                    <span class="status"><span></span> Connect+ ativo</span>
+                </div>
+            </header>
+
+
+            <section class="view active" id="view-chat">
+                <div class="chat-layout">
+                    <div class="conversation">
+                        <div class="conversation-header">
+                            <div class="avatar group-avatar" id="avatarGrupo">F</div>
+                            <div class="conversation-info">
+                                <h3 id="nomeGrupo">Time de Futsal</h3>
+                                <p id="statusGrupo">Grupo de conversa · 8 participantes</p>
+                            </div>
+                            <button class="icon-button" id="verInfo" title="Informações">ⓘ</button>
+                        </div>
+
+
+                        <div class="messages" id="mensagens"></div>
+
+
+                        <div class="suggestion" id="sugestao" hidden>
+                            <div class="suggestion-icon">✨</div>
+                            <div class="suggestion-content">
+                                <strong>O Connect+ percebeu algo importante!</strong>
+                                <p id="textoSugestao"></p>
+                                <div class="suggestion-actions">
+                                  <button type="button" class="primary small" id="criarAcao"> Criar tarefa</button>
+                                    <button class="secondary small" id="dispensarSugestao">Agora não</button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <form class="message-form" id="formMensagem">
+                            <input type="text" id="campoMensagem"
+                                placeholder="Digite sua mensagem..."
+                                autocomplete="off" required>
+                            <button type="submit" class="send-button">Enviar ↗</button>
+                        </form>
+                        <div class="chat-hint">✨ O Connect+ pode identificar tarefas e compromissos nas mensagens.</div>
+                    </div>
+
+
+                    <aside class="right-panel">
+                        <div class="panel-card">
+                            <div class="panel-heading">
+                                <h3>✨ Assistente Connect+</h3>
+                            </div>
+                            <div class="assistant-intro">
+                                <div class="assistant-icon">✦</div>
+                                <p>Sou seu assistente inteligente. Ajudo a transformar conversas em ações.</p>
+                            </div>
+                            <div class="panel-divider"></div>
+                            <h4>Próximas atividades</h4>
+                            <div id="resumoAtividades"></div>
+                            <button class="text-button" data-go="tarefas">Ver todas as tarefas →</button>
+                        </div>
+
+
+                        <div class="panel-card memory-card">
+                            <div class="panel-heading">
+                                <h3>🧠 Memória inteligente</h3>
+                            </div>
+                            <p class="muted">Informações importantes guardadas nas suas conversas.</p>
+                            <div id="resumoMemoria"></div>
+                            <button class="text-button" data-go="memoria">Ver memória completa →</button>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+
+            <section class="view" id="view-tarefas">
+                <div class="page-content">
+                    <div class="page-heading">
+                        <div>
+                            <h2>Minhas tarefas</h2>
+                            <p>Organize suas atividades em um só lugar.</p>
+                        </div>
+                        <button class="primary" id="novaTarefa">＋ Nova tarefa</button>
+                    </div>
+                    <div class="task-stats" id="estatisticasTarefas"></div>
+                    <div class="task-list" id="listaTarefas"></div>
+                </div>
+            </section>
+
+
+            <section class="view" id="view-eventos">
+                <div class="page-content">
+                    <div class="page-heading">
+                        <div>
+                            <h2>Eventos</h2>
+                            <p>Organize encontros, jogos e compromissos.</p>
+                        </div>
+                        <button class="primary" id="novoEvento">＋ Novo evento</button>
+                    </div>
+                    <div class="event-list" id="listaEventos"></div>
+                </div>
+            </section>
+
+
+            <section class="view" id="view-enquetes">
+                <div class="page-content">
+                    <div class="page-heading">
+                        <div>
+                            <h2>Enquetes</h2>
+                            <p>Ajude seu grupo a tomar decisões.</p>
+                        </div>
+                        <button class="primary" id="novaEnquete">＋ Nova enquete</button>
+                    </div>
+                    <div class="poll-list" id="listaEnquetes"></div>
+                </div>
+            </section>
+
+
+            <section class="view" id="view-memoria">
+                <div class="page-content">
+                    <div class="page-heading">
+                        <div>
+                            <h2>Memória inteligente</h2>
+                            <p>Informações importantes identificadas nas conversas.</p>
+                        </div>
+                    </div>
+                    <div class="memory-list" id="listaMemoria"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+    <dialog id="modal">
+        <form id="formModal" class="modal-form">
+            <div class="modal-header">
+                <h2 id="modalTitulo">Nova atividade</h2>
+                <button type="button" class="icon-button" id="fecharModal">✕</button>
+            </div>
+            <div id="modalCampos"></div>
+            <div class="modal-actions">
+                <button type="button" class="secondary" id="cancelarModal">Cancelar</button>
+                <button type="submit" class="primary">Salvar</button>
+            </div>
+        </form>
+    </dialog>
+
+
+    <script src="app.js"></script>
+</body>
+</html>
