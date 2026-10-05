@@ -71,7 +71,11 @@ button {
 .logo-icon {
     width: 48px;
     height: 48px;
+<<<<<<< HEAD
     background: linear-gradient(135deg, #353392, #1e1380be);
+=======
+    background: linear-gradient(135deg, #8c70f6, #6042d4);
+>>>>>>> c375084dd465732e06c79ea8bbd3deaf94c79f6e
     border-radius: 15px;
     color: white;
     display: grid;
