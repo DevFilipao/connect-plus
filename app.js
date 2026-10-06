@@ -25,19 +25,19 @@ function carregarDados(chave, padrao) {
 let conversas = carregarDados("connect_conversas", [
     {
         id: 1,
-        nome: "Comunidade",
+        nome: "Time de Futsal",
         avatar: "F",
         descricao: "Grupo de conversa · 8 participantes",
         mensagens: [
             {
                 autor: "Lucas",
-                texto: "Pessoal, precisamos organizar o próximo rolê!",
+                texto: "Pessoal, precisamos organizar o próximo jogo do time!",
                 hora: "09:30",
                 minha: false
             },
             {
                 autor: "Ana",
-                texto: "Podemos sair sábado à tarde. Quem consegue ir?",
+                texto: "Podemos jogar sábado à tarde. Quem consegue ir?",
                 hora: "09:32",
                 minha: false
             },
@@ -363,7 +363,7 @@ function analisarMensagem(texto) {
         "aniversário", "aniversario", "passeio",
         "viagem", "festa", "sábado", "sabado",
         "domingo", "segunda", "terça", "terca",
-        "quarta", "quinta", "sexta", "amanhã", "amanha", "hoje"
+        "quarta", "quinta", "sexta", "amanhã", "amanha"
     ];
 
 
@@ -934,14 +934,3 @@ function atualizarTudo() {
 
 atualizarTudo();
 abrirPagina("chat");
-
-document.addEventListener("click", (e) => {
-    const botao = e.target.closest("#dispensarSugestao");
-    if (!botao) return;
-
-    console.log("Clicou em Agora não");
-
-    // Tenta achar o cartão pela classe; se não achar, usa o elemento pai do botão
-    const cartao = botao.closest(".sugestao") || botao.parentElement;
-    cartao.remove();
-});
