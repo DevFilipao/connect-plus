@@ -74,7 +74,13 @@ cd connect-plus
  
 ## 👥 Equipe
  
-- _Adicione aqui os nomes dos integrantes_
+- Filipe
+- Rayssa 
+- Maria Eduarda
+- Paulo Henrique
+- Thayrone
+- João Marcos
+
 ## 📄 Licença
  
 _A definir._
