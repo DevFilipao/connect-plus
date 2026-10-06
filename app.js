@@ -25,19 +25,19 @@ function carregarDados(chave, padrao) {
 let conversas = carregarDados("connect_conversas", [
     {
         id: 1,
-        nome: "Time de Futsal",
+        nome: "Comunidade",
         avatar: "F",
         descricao: "Grupo de conversa · 8 participantes",
         mensagens: [
             {
                 autor: "Lucas",
-                texto: "Pessoal, precisamos organizar o próximo jogo do time!",
+                texto: "Pessoal, precisamos organizar o próximo rolê!",
                 hora: "09:30",
                 minha: false
             },
             {
                 autor: "Ana",
-                texto: "Podemos jogar sábado à tarde. Quem consegue ir?",
+                texto: "Podemos sair sábado à tarde. Quem consegue ir?",
                 hora: "09:32",
                 minha: false
             },
