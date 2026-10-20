@@ -15,6 +15,8 @@ function mostrarSenha(id, botao) {
             }
         }
 
+        
+
         // Máscara do telefone
         const telefone = document.getElementById("telefone");
 
@@ -84,5 +86,7 @@ function mostrarSenha(id, botao) {
             mensagem.style.display = "block";
 
             formulario.reset();
+
+        window.location.href = "app.html";
 
         });
