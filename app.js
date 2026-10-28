@@ -1,3 +1,53 @@
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyZUaQxHXB7PHBjK5lwf8LhJogyWpLzBzrCZ7hVG5DifpzlPZ8V8QRGtGsRpuSkiKGd/exec";
+
+async function consultarPlanilha(acao) {
+    const url = `${GOOGLE_SHEETS_URL}?acao=${encodeURIComponent(acao)}`;
+    const resposta = await fetch(url);
+    const resultado = await resposta.json();
+
+    if (!resultado.sucesso) {
+        throw new Error(resultado.erro || "Erro ao consultar a planilha.");
+    }
+
+    return resultado.dados || [];
+}
+
+async function salvarNaPlanilha(dados) {
+    const resposta = await fetch(GOOGLE_SHEETS_URL, {
+        method: "POST",
+        body: JSON.stringify(dados)
+    });
+
+    const resultado = await resposta.json();
+
+    if (!resultado.sucesso) {
+        throw new Error(resultado.erro || "Erro ao salvar na planilha.");
+    }
+
+    return resultado;
+}
+
+async function testarLeituraPlanilha() {
+    try {
+        const perfis = await consultarPlanilha("perfis");
+        console.log("Perfis recebidos da planilha:", perfis);
+        alert(`Conexão funcionando! Perfis encontrados: ${perfis.length}`);
+    } catch (erro) {
+        console.error("Erro ao consultar a planilha:", erro);
+        alert("Não foi possível ler a planilha. Confira o console.");
+    }
+}
+
+consultarPlanilha("perfis")
+    .then(dados => {
+        alert("Conexão funcionando! Perfis: " + dados.length);
+    })
+    .catch(erro => {
+        alert("Erro: " + erro.message);
+        console.error(erro);
+    });
+
+
 const mensagens = document.getElementById("mensagens");
 const campoMensagem = document.getElementById("campoMensagem");
 const formulario = document.getElementById("formMensagem");
