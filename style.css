@@ -2,16 +2,33 @@
 
 
 :root {
-    --primary: #7254e8;
-    --primary-dark: #5b3ec7;
-    --primary-light: #f0ebff;
-    --bg: #f7f7fc;
-    --white: #ffffff;
-    --text: #26243a;
-    --muted: #89879c;
-    --border: #eeedf5;
-    --green: #24a879;
-    --shadow: 0 5px 25px rgba(50, 35, 100, 0.05);
+    /* Azul principal */
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: rgba(59, 130, 246, 0.16);
+
+
+    /* Fundos (do mais escuro ao mais claro) */
+    --bg: #060e1a;
+    --white: #0b1626;
+    --surface: #0b1626;
+    --surface-2: #0f1d33;
+    --surface-3: #14274a;
+
+
+    /* Textos */
+    --text: #d6e2f2;
+    --muted: #8ba3c0;
+    --faint: #5f7896;
+
+
+    /* Bordas e detalhes */
+    --border: #1b3150;
+    --accent: #38bdf8;
+    --green: #38bdf8;
+
+
+    --shadow: 0 5px 25px rgba(0, 0, 0, 0.35);
 }
 
 
@@ -51,7 +68,7 @@ button {
 
 .sidebar {
     width: 265px;
-    background: var(--white);
+    background: #0a1424;
     border-right: 1px solid var(--border);
     padding: 25px 17px 15px;
     display: flex;
@@ -71,18 +88,14 @@ button {
 .logo-icon {
     width: 48px;
     height: 48px;
-<<<<<<< HEAD
-    background: linear-gradient(135deg, #353392, #1e1380be);
-=======
-    background: linear-gradient(135deg, #8c70f6, #6042d4);
->>>>>>> c375084dd465732e06c79ea8bbd3deaf94c79f6e
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
     border-radius: 15px;
     color: white;
     display: grid;
     place-items: center;
     font-size: 21px;
     font-weight: 800;
-    box-shadow: 0 5px 15px #7254e833;
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
 }
 
 
@@ -122,7 +135,7 @@ button {
 
 .sidebar-title {
     font-size: 10px;
-    color: #a09db2;
+    color: var(--faint);
     font-weight: 700;
     letter-spacing: 1.4px;
     padding: 12px 12px 10px;
@@ -136,7 +149,7 @@ button {
     gap: 12px;
     border: none;
     background: transparent;
-    color: #69677e;
+    color: var(--muted);
     padding: 13px 12px;
     border-radius: 10px;
     text-align: left;
@@ -146,12 +159,12 @@ button {
 
 
 .menu-item:hover {
-    background: #f8f6ff;
+    background: var(--surface-3);
 }
 
 
 .menu-item.active {
-    color: var(--primary);
+    color: #9cc4ff;
     background: var(--primary-light);
     font-weight: 700;
 }
@@ -166,7 +179,8 @@ button {
 
 .counter {
     margin-left: auto;
-    background: #e8e0ff;
+    background: rgba(59, 130, 246, 0.2);
+    color: #9cc4ff;
     padding: 3px 8px;
     border-radius: 20px;
     font-size: 11px;
@@ -195,7 +209,7 @@ button {
 
 
 .chat-contact:hover, .chat-contact.selected {
-    background: #f6f3ff;
+    background: var(--surface-3);
 }
 
 
@@ -226,8 +240,8 @@ button {
     width: 42px;
     height: 42px;
     border-radius: 14px;
-    background: #eee6ff;
-    color: #7254e8;
+    background: #16294a;
+    color: #9cc4ff;
     display: grid;
     place-items: center;
     font-weight: 700;
@@ -236,14 +250,14 @@ button {
 
 
 .group-avatar {
-    background: linear-gradient(135deg, #e4d9ff, #c7b5ff);
-    color: #5d42bb;
+    background: linear-gradient(135deg, #1b3a6b, #234a87);
+    color: #bbd7ff;
     font-size: 18px;
 }
 
 
 .user-avatar {
-    background: #e7e2ff;
+    background: #1b3358;
 }
 
 
@@ -283,7 +297,7 @@ button {
 
 .topbar {
     height: 100px;
-    background: white;
+    background: #0a1626;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -306,7 +320,7 @@ button {
 
 .status {
     color: var(--green);
-    background: #e9f8f1;
+    background: rgba(56, 189, 248, 0.12);
     padding: 9px 13px;
     border-radius: 20px;
     font-size: 11px;
@@ -353,7 +367,7 @@ button {
 .conversation {
     display: flex;
     flex-direction: column;
-    background: white;
+    background: #0b1a2e;
     border: 1px solid var(--border);
     border-radius: 17px;
     overflow: hidden;
@@ -393,9 +407,9 @@ button {
     width: 35px;
     height: 35px;
     border: 1px solid var(--border);
-    background: white;
+    background: var(--surface-2);
     border-radius: 10px;
-    color: #77738b;
+    color: var(--muted);
 }
 
 
@@ -413,14 +427,14 @@ button {
     flex-direction: column;
     gap: 17px;
     padding: 22px;
-    background: #fcfbff;
+    background: #091524;
 }
 
 
 .date-divider {
     text-align: center;
     font-size: 10px;
-    color: #a09db2;
+    color: var(--faint);
     margin: 5px 0;
 }
 
@@ -443,8 +457,8 @@ button {
     width: 29px;
     height: 29px;
     border-radius: 10px;
-    background: #eee6ff;
-    color: #7254e8;
+    background: #16294a;
+    color: #9cc4ff;
     display: grid;
     place-items: center;
     font-size: 11px;
@@ -468,8 +482,8 @@ button {
 .message-bubble {
     padding: 12px 15px;
     border-radius: 5px 15px 15px 15px;
-    background: #f0edf9;
-    color: #48445c;
+    background: #15263f;
+    color: var(--text);
     font-size: 12px;
     line-height: 1.7;
     overflow-wrap: anywhere;
@@ -486,14 +500,14 @@ button {
 .message-time {
     display: block;
     font-size: 9px;
-    color: #aaa6ba;
+    color: var(--faint);
     margin-top: 5px;
     text-align: right;
 }
 
 
 .mine .message-time {
-    color: #cfc4ff;
+    color: #cfe0ff;
 }
 
 
@@ -508,8 +522,9 @@ button {
 .message-form input {
     flex: 1;
     min-width: 0;
-    border: 1px solid #e8e5f1;
-    background: #faf9fd;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
     border-radius: 12px;
     padding: 14px;
     font-size: 12px;
@@ -535,7 +550,7 @@ button {
 
 .chat-hint {
     padding: 0 18px 14px;
-    color: #aaa6ba;
+    color: var(--faint);
     font-size: 9px;
 }
 
@@ -545,8 +560,8 @@ button {
     gap: 12px;
     margin: 0 16px 10px;
     padding: 14px;
-    border: 1px solid #e4dcff;
-    background: #f7f3ff;
+    border: 1px solid #1e3a66;
+    background: #0f2140;
     border-radius: 13px;
 }
 
@@ -554,7 +569,7 @@ button {
 .suggestion-icon {
     width: 32px;
     height: 32px;
-    background: #e7deff;
+    background: #16315c;
     color: var(--primary);
     border-radius: 10px;
     display: grid;
@@ -578,7 +593,7 @@ button {
 
 .suggestion-content p {
     font-size: 11px;
-    color: #6d6585;
+    color: var(--muted);
     line-height: 1.6;
 }
 
@@ -602,7 +617,7 @@ button {
 
 
 .panel-card {
-    background: white;
+    background: #0d1b30;
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 18px;
@@ -640,7 +655,7 @@ button {
 
 .assistant-intro p {
     font-size: 11px;
-    color: #77738b;
+    color: var(--muted);
     line-height: 1.8;
 }
 
@@ -661,7 +676,7 @@ button {
     display: flex;
     gap: 10px;
     padding: 11px 0;
-    border-bottom: 1px solid #f2f0f7;
+    border-bottom: 1px solid var(--border);
 }
 
 
@@ -712,7 +727,7 @@ button {
 
 .memory-mini {
     padding: 10px 0;
-    border-bottom: 1px solid #f2f0f7;
+    border-bottom: 1px solid var(--border);
     font-size: 11px;
     line-height: 1.7;
 }
@@ -738,13 +753,13 @@ button {
 
 
 .secondary {
-    background: #f1eff8;
-    color: #666078;
+    background: #16284a;
+    color: #afc4e0;
 }
 
 
 .secondary:hover {
-    background: #e7e2f5;
+    background: #1d3560;
 }
 
 
@@ -794,7 +809,7 @@ button {
 
 
 .stat-card {
-    background: white;
+    background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: 15px;
     padding: 20px;
@@ -821,7 +836,7 @@ button {
 
 
 .task-card, .event-card, .poll-card, .memory-card-item {
-    background: white;
+    background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: 15px;
     padding: 20px;
@@ -867,7 +882,7 @@ button {
 
 .completed .task-details strong {
     text-decoration: line-through;
-    color: #aaa6ba;
+    color: var(--faint);
 }
 
 
@@ -875,8 +890,8 @@ button {
     display: inline-block;
     padding: 5px 9px;
     border-radius: 20px;
-    background: #f0ebff;
-    color: #7254e8;
+    background: rgba(59, 130, 246, 0.16);
+    color: #9cc4ff;
     font-size: 10px;
     font-weight: 600;
 }
@@ -885,7 +900,7 @@ button {
 .delete-button {
     border: none;
     background: transparent;
-    color: #aaa6ba;
+    color: var(--faint);
     font-size: 17px;
     padding: 5px;
 }
@@ -914,7 +929,7 @@ button {
 .event-date {
     display: inline-block;
     background: var(--primary-light);
-    color: var(--primary);
+    color: #9cc4ff;
     border-radius: 10px;
     padding: 8px 12px;
     font-size: 11px;
@@ -923,8 +938,8 @@ button {
 
 
 .empty-state {
-    background: white;
-    border: 1px dashed #dcd5ef;
+    background: var(--surface-2);
+    border: 1px dashed #1f3a63;
     border-radius: 15px;
     padding: 45px 20px;
     text-align: center;
@@ -948,7 +963,7 @@ button {
     gap: 10px;
     padding: 12px;
     margin-top: 10px;
-    background: #f8f6ff;
+    background: #0f2038;
     border-radius: 10px;
     font-size: 12px;
 }
@@ -968,7 +983,7 @@ button {
 .poll-option button {
     border: none;
     background: transparent;
-    color: #a09db2;
+    color: var(--faint);
 }
 
 
@@ -993,7 +1008,7 @@ button {
 
 .poll-bar {
     height: 7px;
-    background: #eeeaf8;
+    background: #14284a;
     border-radius: 10px;
     overflow: hidden;
 }
@@ -1028,17 +1043,19 @@ button {
 
 
 dialog {
-    border: none;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
     border-radius: 18px;
     width: min(480px, calc(100% - 30px));
     margin: auto;
     padding: 0;
-    box-shadow: 0 20px 80px #20163d33;
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);
 }
 
 
 dialog::backdrop {
-    background: #20163d66;
+    background: rgba(3, 8, 18, 0.7);
     backdrop-filter: blur(3px);
 }
 
@@ -1076,13 +1093,13 @@ dialog::backdrop {
 
 .form-field input, .form-field textarea, .form-field select {
     width: 100%;
-    border: 1px solid #e6e2f0;
-    background: #fbfaff;
+    background: #0a1626;
+    border: 1px solid #1f3a63;
+    color: var(--text);
     border-radius: 10px;
     padding: 12px;
     outline: none;
     font-size: 12px;
-    color: var(--text);
 }
 
 
@@ -1286,3 +1303,10 @@ dialog::backdrop {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* Esconde a sugestão quando o botão Agora não é clicado */
+.suggestion[hidden] {
+    display: none !important;
+}
+

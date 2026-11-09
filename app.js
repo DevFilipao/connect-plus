@@ -1,7 +1,7 @@
 const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyZUaQxHXB7PHBjK5lwf8LhJogyWpLzBzrCZ7hVG5DifpzlPZ8V8QRGtGsRpuSkiKGd/exec";
 
 async function consultarPlanilha(acao) {
-    const url = `${GOOGLE_SHEETS_URL}?acao=${encodeURIComponent(acao)}`;
+    const url = `GOOGLESHEETSURL?acao={encodeURIComponent(acao)}`;
     const resposta = await fetch(url);
     const resultado = await resposta.json();
 
@@ -46,6 +46,8 @@ consultarPlanilha("perfis")
         alert("Erro: " + erro.message);
         console.error(erro);
     });
+
+
 
 
 const mensagens = document.getElementById("mensagens");
@@ -197,7 +199,7 @@ function formatarData(data) {
     if (partes.length !== 3) return data;
  
  
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    return `partes[2]/{partes[1]}/${partes[0]}`;
 }
  
  
@@ -345,50 +347,74 @@ function renderizarChat() {
 }
  
  
-function enviarMensagem(texto) {
+// ENVIAR MENSAGEM
+
+
+async function enviarMensagem(texto) {
     const conversa = obterConversa();
+
+
     if (!conversa || !texto.trim()) return;
- 
- 
+
+
+    const textoLimpo = texto.trim();
+
+
     const mensagem = {
         autor: nomeUsuario,
-        texto: texto.trim(),
+        texto: textoLimpo,
         hora: horarioAtual(),
         minha: true
     };
- 
- 
+
+
     conversa.mensagens.push(mensagem);
- 
- 
+
+
     salvarDados();
     renderizarChat();
     renderizarListaConversas();
-    analisarMensagem(texto.trim());
+
+
+    // Envia para a planilha
+    if (conversa.contatoReal) {
+        await enviarMensagemParaPlanilha(textoLimpo, conversa);
+    }
+
+
+    analisarMensagem(textoLimpo);
 }
- 
- 
-formulario.addEventListener("submit", event => {
+
+
+
+
+// FORMULÁRIO DE ENVIO
+
+
+formulario.addEventListener("submit", async event => {
     event.preventDefault();
- 
- 
+
+
     const texto = campoMensagem.value.trim();
     if (!texto) return;
- 
- 
-    enviarMensagem(texto);
+
+
+    await enviarMensagem(texto);
+
+
     campoMensagem.value = "";
     campoMensagem.focus();
 });
- 
- 
+
+
+
+
 // CRIAR NOVA CONVERSA
- 
- 
+
+
 document.getElementById("novoChat").addEventListener("click", () => {
     abrirModal("chat");
 });
- 
  
 function criarConversa(nome, telefone) {
     const nova = {
@@ -729,7 +755,7 @@ function renderizarEnquetes() {
                             </div>
                             <div class="poll-bar"><span style="width:${porcentagem}%"></span></div>
                             ${enquete.voto === null ? `
-                                <button class="secondary small" data-votar="${enquete.id}" data-opcao="${indice}">
+                                <button class="secondary small" data-votar="enquete.id"data-opcao="{indice}">
                                     Votar nesta opção
                                 </button>
                             ` : ""}
@@ -837,7 +863,7 @@ function renderizarResumoAtividades() {
         })),
         ...eventos.slice(0, 3).map(e => ({
             titulo: e.titulo,
-            detalhe: `${formatarData(e.data)}${e.horario ? " · " + e.horario : ""}`
+            detalhe: `formatarData(e.data){e.horario ? " · " + e.horario : ""}`
         }))
     ].slice(0, 4);
  
@@ -864,8 +890,8 @@ function campoFormulario(nome, rotulo, tipo = "text", valor = "", obrigatorio = 
     if (tipo === "textarea") {
         return `
             <div class="form-field">
-                <label for="${id}">${rotulo}</label>
-                <textarea id="${id}" name="${nome}" ${obrigatorio ? "required" : ""}>${escaparHTML(valor)}</textarea>
+                <label for="id">{rotulo}</label>
+                <textarea id="id"name="{nome}" obrigatorio?"required":"">{escaparHTML(valor)}</textarea>
             </div>
         `;
     }
@@ -873,8 +899,8 @@ function campoFormulario(nome, rotulo, tipo = "text", valor = "", obrigatorio = 
  
     return `
         <div class="form-field">
-            <label for="${id}">${rotulo}</label>
-            <input id="${id}" name="${nome}" type="${tipo}"
+            <label for="id">{rotulo}</label>
+            <input id="id"name="{nome}" type="${tipo}"
                 value="${escaparHTML(valor)}"
                 ${obrigatorio ? "required" : ""}>
         </div>
@@ -1021,3 +1047,4 @@ function atualizarTudo() {
  
 atualizarTudo();
 abrirPagina("chat");
+

@@ -13,13 +13,11 @@ function mostrar(alvo, atualizarHash) {
         doc.classList.toggle("ativo", doc.id === alvo);
     });
 
-
     if (atualizarHash) {
         history.replaceState(null, "", "#" + alvo);
         window.scrollTo({ top: 0 });
     }
 }
-
 
 abas.forEach(function (aba) {
     aba.addEventListener("click", function () {
@@ -28,7 +26,6 @@ abas.forEach(function (aba) {
 });
 
 function abrirPeloLink() {
-
 
     const hash = location.hash.replace("#", "");
 
