@@ -72,63 +72,32 @@ const usuario = carregarDados("connect_usuario", null);
 const nomeUsuario = (usuario && usuario.nome ? usuario.nome.trim().split(" ")[0] : "") || "Maria";
  
  
-let conversas = carregarDados("connect_conversas", [
-    {
-        id: 1,
-        nome: "Comunidade",
-        avatar: "C",
-        descricao: "Grupo de conversa · 8 participantes",
-        mensagens: [
-            {
-                autor: "Lucas",
-                texto: "Pessoal, precisamos organizar o próximo rolê!",
-                hora: "09:30",
-                minha: false
-            },
-            {
-                autor: "Ana",
-                texto: "Podemos sair sábado à tarde. Quem consegue ir?",
-                hora: "09:32",
-                minha: false
-            },
-            {
-                autor: nomeUsuario,
-                texto: "Boa ideia! Precisamos confirmar o local e o horário.",
-                hora: "09:35",
-                minha: true
-            }
-        ]
-    },
-    {
-        id: 2,
-        nome: "Amigos da escola",
-        avatar: "A",
-        descricao: "Grupo de conversa · 5 participantes",
-        mensagens: [
-            {
-                autor: "Julia",
-                texto: "Gente, não esqueçam da prova de matemática!",
-                hora: "10:10",
-                minha: false
-            },
-            {
-                autor: nomeUsuario,
-                texto: "Vou separar um tempo para estudar hoje.",
-                hora: "10:12",
-                minha: true
-            }
-        ]
-    }
-]);
- 
- 
+const CONVERSA_IA = {
+    id: 1,
+    nome: "CONNECT+ AI",
+    avatar: "C+",
+    descricao: "Chat privado com a IA",
+    mensagens: []
+};
+
+
+let conversas = carregarDados("connect_conversas", [CONVERSA_IA]);
+
+
+// Migração: remove as conversas de exemplo antigas e garante o chat da IA
+conversas = conversas.filter(c => c.nome !== "Comunidade" && c.nome !== "Amigos da escola" && c.nome !== "Time de Futsal");
+if (!conversas.some(c => c.id === CONVERSA_IA.id)) {
+    conversas.unshift({ ...CONVERSA_IA, mensagens: [] });
+}
+
+
 let tarefas = carregarDados("connect_tarefas", []);
 let eventos = carregarDados("connect_eventos", []);
 let enquetes = carregarDados("connect_enquetes", []);
 let memoria = carregarDados("connect_memoria", []);
  
  
-let conversaAtual = conversas[0]?.id ?? null;
+let conversaAtual = CONVERSA_IA.id;
 let sugestaoAtual = null;
 let tipoModal = "";
  
@@ -210,12 +179,7 @@ function criarVazio(titulo, descricao) {
  
  
 function renderizarPerfil() {
-    const nome = document.querySelector(".profile strong");
-    const avatar = document.querySelector(".profile .user-avatar");
- 
- 
-    if (nome) nome.textContent = nomeUsuario;
-    if (avatar) avatar.textContent = nomeUsuario.charAt(0).toUpperCase();
+    // O rodapé agora mostra apenas a logo do Connect+ (sem nome de usuário).
 }
  
  
@@ -271,6 +235,7 @@ document.querySelectorAll("[data-go]").forEach(botao => {
  
 function renderizarListaConversas() {
     const lista = document.getElementById("listaConversas");
+    if (!lista) return; // a lista lateral de conversas foi removida
  
  
     lista.innerHTML = conversas.map(conversa => {
