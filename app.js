@@ -1,7 +1,7 @@
 const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyZUaQxHXB7PHBjK5lwf8LhJogyWpLzBzrCZ7hVG5DifpzlPZ8V8QRGtGsRpuSkiKGd/exec";
 
 async function consultarPlanilha(acao) {
-    const url = `GOOGLESHEETSURL?acao={encodeURIComponent(acao)}`;
+    const url = `${GOOGLE_SHEETS_URL}?acao=${encodeURIComponent(acao)}`;
     const resposta = await fetch(url);
     const resultado = await resposta.json();
 
@@ -38,14 +38,7 @@ async function testarLeituraPlanilha() {
     }
 }
 
-consultarPlanilha("perfis")
-    .then(dados => {
-        alert("Conexão funcionando! Perfis: " + dados.length);
-    })
-    .catch(erro => {
-        alert("Erro: " + erro.message);
-        console.error(erro);
-    });
+// Para testar a conexão com a planilha, rode testarLeituraPlanilha() no console.
 
 
 
@@ -83,7 +76,7 @@ let conversas = carregarDados("connect_conversas", [
     {
         id: 1,
         nome: "Comunidade",
-        avatar: "F",
+        avatar: "C",
         descricao: "Grupo de conversa · 8 participantes",
         mensagens: [
             {
@@ -199,7 +192,7 @@ function formatarData(data) {
     if (partes.length !== 3) return data;
  
  
-    return `partes[2]/{partes[1]}/${partes[0]}`;
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
  
  
@@ -331,7 +324,7 @@ function renderizarChat() {
     document.getElementById("statusGrupo").textContent = conversa.descricao;
  
  
-    mensagens.innerHTML = conversa.mensagens.map(mensagem => `
+    mensagens.innerHTML = conversa.mensagens.map(mensagem => mensagem.tipo === "quadro" ? htmlQuadro(mensagem) : `
         <div class="message-row ${mensagem.minha ? "mine" : ""}">
             <div class="message-avatar">${escaparHTML(mensagem.autor.charAt(0).toUpperCase())}</div>
             <div class="message-content">
@@ -438,6 +431,209 @@ function criarConversa(nome, telefone) {
 }
  
  
+// QUADRO DE COMPROMISSO FEITO PELA IA
+
+
+const OPCOES_QUADRO = ["Vou", "Talvez", "Não vou"];
+
+const DIAS_SEMANA = [
+    { chaves: ["domingo"], indice: 0, nome: "Domingo" },
+    { chaves: ["segunda"], indice: 1, nome: "Segunda-feira" },
+    { chaves: ["terça", "terca"], indice: 2, nome: "Terça-feira" },
+    { chaves: ["quarta"], indice: 3, nome: "Quarta-feira" },
+    { chaves: ["quinta"], indice: 4, nome: "Quinta-feira" },
+    { chaves: ["sexta"], indice: 5, nome: "Sexta-feira" },
+    { chaves: ["sábado", "sabado"], indice: 6, nome: "Sábado" }
+];
+
+const TIPOS_COMPROMISSO = [
+    ["jogo", "Jogo"], ["reunião", "Reunião"], ["reuniao", "Reunião"],
+    ["encontro", "Encontro"], ["aniversário", "Aniversário"],
+    ["aniversario", "Aniversário"], ["passeio", "Passeio"],
+    ["viagem", "Viagem"], ["festa", "Festa"]
+];
+
+
+function dataParaTexto(data) {
+    return [
+        data.getFullYear(),
+        String(data.getMonth() + 1).padStart(2, "0"),
+        String(data.getDate()).padStart(2, "0")
+    ].join("-");
+}
+
+
+// Lê a frase e tenta descobrir tipo, dia, horário e local
+function extrairCompromisso(texto) {
+    const minusculo = texto.toLowerCase();
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    let titulo = "Compromisso";
+    const tipo = TIPOS_COMPROMISSO.find(([chave]) => minusculo.includes(chave));
+    if (tipo) titulo = tipo[1];
+
+    let data = "";
+    let diaNome = "";
+
+    const explicita = minusculo.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
+    if (explicita) {
+        const ano = explicita[3]
+            ? (explicita[3].length === 2 ? 2000 + Number(explicita[3]) : Number(explicita[3]))
+            : hoje.getFullYear();
+        data = `${ano}-${explicita[2].padStart(2, "0")}-${explicita[1].padStart(2, "0")}`;
+    } else if (/\bamanh[ãa]\b/.test(minusculo)) {
+        const d = new Date(hoje);
+        d.setDate(d.getDate() + 1);
+        data = dataParaTexto(d);
+        diaNome = "Amanhã";
+    } else if (/\bhoje\b/.test(minusculo)) {
+        data = dataParaTexto(hoje);
+        diaNome = "Hoje";
+    } else {
+        const dia = DIAS_SEMANA.find(item => item.chaves.some(c => minusculo.includes(c)));
+        if (dia) {
+            const d = new Date(hoje);
+            const falta = (dia.indice - d.getDay() + 7) % 7 || 7;
+            d.setDate(d.getDate() + falta);
+            data = dataParaTexto(d);
+            diaNome = dia.nome;
+        }
+    }
+
+    let horario = "";
+    const hora = minusculo.match(/\b(\d{1,2})\s*(?:h|:)\s*(\d{2})?\b/) ||
+        minusculo.match(/\bàs\s+(\d{1,2})()\b/);
+    if (hora && Number(hora[1]) < 24) {
+        horario = `${hora[1].padStart(2, "0")}:${hora[2] || "00"}`;
+    }
+
+    let local = "";
+    const achouLocal = texto.match(
+        /\b(?:no|na|em|n[oa]s)\s+((?:[A-ZÀ-Ú][\wÀ-ú]*)(?:\s+(?:d[aeo]s?\s+)?[A-ZÀ-Ú][\wÀ-ú]*)*)/
+    );
+    if (achouLocal) local = achouLocal[1];
+
+    if (diaNome) titulo = `${titulo} · ${diaNome}`;
+
+    return { titulo, data, horario, local };
+}
+
+
+function publicarQuadro(compromisso, { conversaId, salvo = false } = {}) {
+    const conversa = conversas.find(c => c.id === conversaId);
+    if (!conversa) return;
+
+    const quadro = {
+        id: gerarId(),
+        titulo: compromisso.titulo,
+        data: compromisso.data || "",
+        horario: compromisso.horario || "",
+        local: compromisso.local || "",
+        opcoes: OPCOES_QUADRO.map(texto => ({ texto, votos: 0 })),
+        voto: null,
+        salvo
+    };
+
+    // Pequena pausa para parecer que a IA está organizando
+    setTimeout(() => {
+        conversa.mensagens.push({
+            tipo: "quadro",
+            autor: "Connect+ IA",
+            texto: `📋 ${quadro.titulo}`,
+            hora: horarioAtual(),
+            minha: false,
+            quadro
+        });
+
+        salvarDados();
+        renderizarListaConversas();
+        if (conversaAtual === conversa.id) renderizarChat();
+    }, 700);
+}
+
+
+function htmlQuadro(mensagem) {
+    const q = mensagem.quadro;
+    const total = q.opcoes.reduce((soma, o) => soma + o.votos, 0);
+
+    return `
+        <div class="message-row ai-row">
+            <div class="message-avatar ai-avatar">✦</div>
+            <div class="message-content">
+                <div class="message-name">Connect+ IA</div>
+                <div class="ai-board">
+                    <span class="tag">📋 Quadro do compromisso</span>
+                    <h4>${escaparHTML(q.titulo)}</h4>
+                    <ul class="ai-board-info">
+                        <li>📅 ${q.data ? escaparHTML(formatarData(q.data)) : "Data a definir"}</li>
+                        <li>🕒 ${q.horario ? escaparHTML(q.horario) : "Horário a definir"}</li>
+                        <li>📍 ${q.local ? escaparHTML(q.local) : "Local a definir"}</li>
+                    </ul>
+                    <p class="ai-board-question">Quem vai?</p>
+                    ${q.opcoes.map((opcao, indice) => {
+                        const pct = total ? Math.round(opcao.votos / total * 100) : 0;
+                        return `
+                            <button type="button" class="ai-option ${q.voto === indice ? "voted" : ""}"
+                                data-quadro="${q.id}" data-opcao="${indice}">
+                                <span class="ai-option-bar" style="width:${pct}%"></span>
+                                <span class="ai-option-text">${escaparHTML(opcao.texto)}</span>
+                                <strong>${opcao.votos}</strong>
+                            </button>
+                        `;
+                    }).join("")}
+                    ${q.salvo
+                        ? `<div class="ai-board-saved">✓ Salvo em Eventos</div>`
+                        : `<button type="button" class="secondary small" data-quadro-salvar="${q.id}">＋ Adicionar aos eventos</button>`}
+                </div>
+                <span class="message-time">${escaparHTML(mensagem.hora)}</span>
+            </div>
+        </div>
+    `;
+}
+
+
+function acharQuadro(id) {
+    const conversa = obterConversa();
+    const mensagem = conversa?.mensagens.find(m => m.tipo === "quadro" && m.quadro.id === id);
+    return mensagem?.quadro;
+}
+
+
+// Cliques nos quadros (votar e salvar em Eventos)
+mensagens.addEventListener("click", event => {
+    const votar = event.target.closest("[data-quadro]");
+    const salvarEvento = event.target.closest("[data-quadro-salvar]");
+
+    if (votar) {
+        const q = acharQuadro(Number(votar.dataset.quadro));
+        if (!q) return;
+
+        const indice = Number(votar.dataset.opcao);
+        if (q.voto !== null) q.opcoes[q.voto].votos--;
+
+        if (q.voto === indice) {
+            q.voto = null; // clicar de novo remove o voto
+        } else {
+            q.opcoes[indice].votos++;
+            q.voto = indice;
+        }
+
+        salvarDados();
+        renderizarChat();
+    }
+
+    if (salvarEvento) {
+        const q = acharQuadro(Number(salvarEvento.dataset.quadroSalvar));
+        if (!q || q.salvo) return;
+
+        q.salvo = true;
+        adicionarEvento(q.titulo, q.data, q.horario, q.local);
+        renderizarChat();
+    }
+});
+
+
 // ASSISTENTE INTELIGENTE SIMULADO
  
  
@@ -482,11 +678,10 @@ function analisarMensagem(texto) {
             "Parece que vocês estão tentando tomar uma decisão. Que tal criar uma enquete?"
         );
     } else if (temEvento) {
-        mostrarSugestao(
-            "evento",
-            texto,
-            "Parece que vocês estão organizando um compromisso. Que tal registrar um evento?"
-        );
+        // A IA do Connect+ monta o quadro do compromisso direto no chat
+        sugestao.hidden = true;
+        sugestaoAtual = null;
+        publicarQuadro(extrairCompromisso(texto), { conversaId: conversaAtual });
     } else if (temTarefa) {
         mostrarSugestao(
             "tarefa",
@@ -755,7 +950,7 @@ function renderizarEnquetes() {
                             </div>
                             <div class="poll-bar"><span style="width:${porcentagem}%"></span></div>
                             ${enquete.voto === null ? `
-                                <button class="secondary small" data-votar="enquete.id"data-opcao="{indice}">
+                                <button class="secondary small" data-votar="${enquete.id}" data-opcao="${indice}">
                                     Votar nesta opção
                                 </button>
                             ` : ""}
@@ -863,7 +1058,7 @@ function renderizarResumoAtividades() {
         })),
         ...eventos.slice(0, 3).map(e => ({
             titulo: e.titulo,
-            detalhe: `formatarData(e.data){e.horario ? " · " + e.horario : ""}`
+            detalhe: `${formatarData(e.data)}${e.horario ? " · " + e.horario : ""}`
         }))
     ].slice(0, 4);
  
@@ -885,28 +1080,28 @@ function renderizarResumoAtividades() {
  
 function campoFormulario(nome, rotulo, tipo = "text", valor = "", obrigatorio = true) {
     const id = `campo-${nome}`;
- 
- 
+    const required = obrigatorio ? "required" : "";
+
+
     if (tipo === "textarea") {
         return `
             <div class="form-field">
-                <label for="id">{rotulo}</label>
-                <textarea id="id"name="{nome}" obrigatorio?"required":"">{escaparHTML(valor)}</textarea>
+                <label for="${id}">${escaparHTML(rotulo)}</label>
+                <textarea id="${id}" name="${nome}" ${required}>${escaparHTML(valor)}</textarea>
             </div>
         `;
     }
- 
- 
+
+
     return `
         <div class="form-field">
-            <label for="id">{rotulo}</label>
-            <input id="id"name="{nome}" type="${tipo}"
-                value="${escaparHTML(valor)}"
-                ${obrigatorio ? "required" : ""}>
+            <label for="${id}">${escaparHTML(rotulo)}</label>
+            <input id="${id}" name="${nome}" type="${tipo}"
+                value="${escaparHTML(valor)}" ${required}>
         </div>
     `;
 }
- 
+
 function abrirModal(tipo, dados = {}) {
     tipoModal = tipo;
  
@@ -939,8 +1134,8 @@ function abrirModal(tipo, dados = {}) {
         chat: {
             titulo: "Nova conversa",
             campos:
-                campoFormulario("nome", "Nome do contato", "text", "") +
-                campoFormulario("telefone", "Número de telefone", "tel", "")
+                campoFormulario("nome", "Nome", "text", "") +
+                campoFormulario("telefone", "Número", "tel", "")
         }
     };
  
@@ -950,58 +1145,80 @@ function abrirModal(tipo, dados = {}) {
 }
  
 function fecharModal() {
-    modal.close();
+    if (modal.open) modal.close();
     formModal.reset();
 }
 
 document.getElementById("fecharModal").addEventListener("click", fecharModal);
 document.getElementById("cancelarModal").addEventListener("click", fecharModal);
- 
+
+// Esc também limpa o formulário
+modal.addEventListener("cancel", () => formModal.reset());
+
+// Clique fora da janela fecha o modal
+modal.addEventListener("click", event => {
+    if (event.target === modal) fecharModal();
+});
+
 formModal.addEventListener("submit", event => {
     event.preventDefault();
- 
+
     const dados = Object.fromEntries(new FormData(formModal).entries());
- 
+    const texto = campo => (dados[campo] || "").trim();
+
     if (tipoModal === "tarefa") {
-        adicionarTarefa(dados.titulo.trim(), dados.descricao.trim(), dados.data);
+        adicionarTarefa(texto("titulo"), texto("descricao"), dados.data || "");
     }
- 
+
     if (tipoModal === "evento") {
+        const compromisso = {
+            titulo: texto("titulo"),
+            data: dados.data || "",
+            horario: dados.horario || "",
+            local: texto("local")
+        };
+
         adicionarEvento(
-            dados.titulo.trim(),
-            dados.data,
-            dados.horario,
-            dados.local.trim(),
-            dados.descricao.trim()
+            compromisso.titulo,
+            compromisso.data,
+            compromisso.horario,
+            compromisso.local,
+            texto("descricao")
         );
+
+        // Quadro da IA na conversa aberta, já marcado como salvo em Eventos
+        if (obterConversa()) {
+            publicarQuadro(compromisso, { conversaId: conversaAtual, salvo: true });
+        }
     }
- 
+
     if (tipoModal === "enquete") {
-        const opcoes = [dados.opcao1, dados.opcao2, dados.opcao3]
-            .map(opcao => opcao.trim())
+        const opcoes = [texto("opcao1"), texto("opcao2"), texto("opcao3")]
             .filter(Boolean);
- 
- 
+
         if (opcoes.length < 2) {
             alert("Informe pelo menos duas opções para a enquete.");
             return;
         }
- 
- 
-        adicionarEnquete(dados.pergunta.trim(), opcoes);
+
+        adicionarEnquete(texto("pergunta"), opcoes);
     }
- 
- 
+
     if (tipoModal === "chat") {
-        criarConversa(
-            dados.nome.trim(),
-            dados.telefone.trim()
-        );
+        const nome = texto("nome");
+        const telefone = texto("telefone");
+
+        if (!nome || !telefone) {
+            alert("Informe o nome e o número do contato.");
+            return;
+        }
+
+        criarConversa(nome, telefone);
     }
- 
+
     fecharModal();
 });
- 
+
 document.getElementById("verInfo").addEventListener("click", () => {
     const conversa = obterConversa();
     if (conversa) {
