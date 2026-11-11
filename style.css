@@ -66,6 +66,11 @@ button {
 /* MENU LATERAL */
 
 
+.menu {
+    display: contents;
+}
+
+
 .sidebar {
     width: 265px;
     background: #0a1424;
@@ -1241,139 +1246,259 @@ dialog::backdrop {
 
 
 @media (max-width: 750px) {
+    /* ---------- Layout: a barra lateral vira um cabeçalho no topo ---------- */
+    .app {
+        flex-direction: column;
+        min-height: 100vh;
+        min-height: 100dvh;
+    }
+
     .sidebar {
-        width: 75px;
-        padding: 18px 8px;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
     }
 
-
+    /* Logo completa (ícone + nome) sempre visível */
     .logo {
-        justify-content: center;
-        padding: 0 0 20px;
+        flex: 1 0 100%;
+        justify-content: flex-start;
+        padding: 0;
+        gap: 10px;
     }
-
-
-    .logo > div:last-child,
-    .new-chat,
-    .new-group,
-    .sidebar-title,
-    .menu-item:not(.active) > span:not(:first-child),
-    .menu-item {
-        font-size: 0;
-    }
-
 
     .logo-icon {
-        width: 48px;
-        height: 48px;
-    }
-
-
-    .menu-item {
-        justify-content: center;
-        padding: 13px 5px;
-        font-size: 0;
-    }
-
-
-    .menu-item > span:first-child {
-        font-size: 20px;
-    }
-
-
-    .menu-item .counter {
-        display: none;
-    }
-
-
-    .chat-list, .profile > div:last-child {
-        display: none;
-    }
-
-
-    .profile {
-        justify-content: center;
-        padding: 15px 0 0;
-    }
-
-
-    .topbar {
-        padding: 15px;
-        height: 85px;
-    }
-
-
-    .topbar h2 {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
         font-size: 18px;
     }
 
+    .logo h1 {
+        font-size: 21px;
+    }
+
+    /* Botões "Nova conversa" e "Novo grupo" lado a lado, com texto visível */
+    .new-chat,
+    .new-group {
+        flex: 1 1 0;
+        min-width: 0;
+        margin: 0;
+        padding: 12px 8px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    /* Menu vira uma faixa horizontal que rola para o lado */
+    .menu {
+        display: flex;
+        flex: 1 0 100%;
+        gap: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+
+    .menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .menu .sidebar-title {
+        display: none;
+    }
+
+    .menu-item {
+        width: auto;
+        flex: 0 0 auto;
+        justify-content: flex-start;
+        gap: 8px;
+        padding: 10px 14px;
+        margin: 0;
+        font-size: 13px;
+        white-space: nowrap;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+    }
+
+    .menu-item > span:first-child {
+        font-size: 16px;
+        width: auto;
+    }
+
+    .menu-item .counter {
+        display: inline-block;
+        margin-left: 2px;
+    }
+
+    /* Lista de conversas e título "CONVERSAS" não cabem no topo */
+    .sidebar > .sidebar-title,
+    .chat-list,
+    .profile {
+        display: none;
+    }
+
+    /* ---------- Área principal ---------- */
+    .topbar {
+        height: auto;
+        min-height: 70px;
+        padding: 12px 15px;
+        gap: 10px;
+    }
+
+    .topbar h2 {
+        font-size: 18px;
+        margin-bottom: 4px;
+    }
 
     .status {
         font-size: 0;
         padding: 10px;
     }
 
-
     .status span {
         margin: 0;
     }
 
-
     .chat-layout {
         padding: 10px;
         gap: 12px;
+        min-height: 0;
     }
-
 
     .conversation {
-        min-height: 560px;
+        min-height: 0;
+        height: calc(100vh - 290px);
+        height: calc(100dvh - 290px);
+        min-height: 420px;
     }
 
+    .conversation-header {
+        padding: 12px;
+        gap: 10px;
+    }
 
     .messages {
         padding: 15px 10px;
     }
 
-
     .message-row {
         max-width: 96%;
     }
 
+    .message-bubble {
+        font-size: 14px;
+    }
+
+    .message-name,
+    .message-time {
+        font-size: 11px;
+    }
+
+    .message-form {
+        padding: 10px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* 16px evita o zoom automático do iPhone ao tocar no campo */
+    .message-form input,
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+        font-size: 16px;
+    }
+
+    .send-button {
+        min-height: 46px;
+        font-size: 13px;
+    }
+
+    .chat-hint {
+        font-size: 11px;
+        padding: 0 12px 12px;
+    }
+
+    .icon-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .add-members {
+        height: 40px;
+    }
+
+    .suggestion {
+        margin: 0 10px 8px;
+    }
+
+    .suggestion-actions {
+        flex-wrap: wrap;
+    }
 
     .right-panel {
         grid-template-columns: 1fr;
+        overflow: visible;
     }
-
 
     .page-content {
-        padding: 20px 12px;
+        padding: 20px 12px calc(20px + env(safe-area-inset-bottom, 0px));
     }
-
 
     .page-heading {
         align-items: flex-start;
         flex-wrap: wrap;
     }
 
+    .page-heading > .primary {
+        width: 100%;
+        padding: 14px;
+    }
 
     .task-stats {
         gap: 8px;
     }
 
-
     .stat-card {
         padding: 13px;
     }
-
 
     .stat-card strong {
         font-size: 22px;
     }
 
-
     .task-card {
         padding: 14px 10px;
         gap: 10px;
+    }
+
+    /* Janela (modal): nunca passa da tela, rola por dentro e botões sempre visíveis */
+    dialog {
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+    }
+
+    .modal-form {
+        padding: 20px 16px;
+    }
+
+    .modal-actions {
+        position: sticky;
+        bottom: -20px;
+        background: var(--surface-2);
+        padding: 12px 0 4px;
+        margin-top: 15px;
+    }
+
+    .modal-actions .primary,
+    .modal-actions .secondary {
+        flex: 1;
+        padding: 14px;
+        font-size: 14px;
     }
 }
 
