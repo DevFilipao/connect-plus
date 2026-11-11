@@ -293,6 +293,7 @@ function renderizarChat() {
     document.getElementById("nomeGrupo").textContent = conversa.nome;
     document.getElementById("avatarGrupo").textContent = conversa.avatar;
     document.getElementById("statusGrupo").textContent = conversa.descricao;
+    document.getElementById("adicionarParticipantes").hidden = conversa.tipo !== "grupo";
 
 
     mensagens.innerHTML = conversa.mensagens.map(mensagem => mensagem.tipo === "quadro" ? htmlQuadro(mensagem) : `
@@ -434,6 +435,26 @@ function criarGrupo(nome, contatos) {
 }
 
 
+// ADICIONAR PARTICIPANTES A UM GRUPO JÁ CRIADO
+
+
+document.getElementById("adicionarParticipantes").addEventListener("click", () => {
+    const conversa = obterConversa();
+    if (!conversa || conversa.tipo !== "grupo") return;
+
+    abrirModal("participantes");
+});
+
+function adicionarParticipantes(conversa, novos) {
+    conversa.membros = [...(conversa.membros || []), ...novos];
+    conversa.descricao = `Grupo · ${conversa.membros.length + 1} participantes`;
+
+    salvarDados();
+    renderizarListaConversas();
+    renderizarChat();
+}
+
+
 // Lista de contatos mostrada dentro do modal "Novo grupo"
 function renderizarContatosGrupo() {
     const lista = document.getElementById("grupoContatos");
@@ -476,8 +497,13 @@ function adicionarContatoGrupo() {
         return;
     }
 
-    if (contatosGrupo.some(c => c.telefone === telefone)) {
-        alert("Esse número já foi adicionado ao grupo.");
+    const jaNoGrupo = tipoModal === "participantes"
+        ? (obterConversa()?.membros || [])
+        : [];
+
+    if (contatosGrupo.some(c => c.telefone === telefone) ||
+        jaNoGrupo.some(c => c.telefone === telefone)) {
+        alert("Esse número já está no grupo.");
         return;
     }
 
@@ -1230,10 +1256,16 @@ function abrirModal(tipo, dados = {}) {
         }
     };
 
+    // Mesmo bloco de contatos do "Novo grupo", mas sem o campo do nome
+    modelos.participantes = {
+        titulo: "Adicionar participantes",
+        campos: modelos.grupo.campos.replace(campoFormulario("nomeGrupo", "Nome", "text", ""), "")
+    };
+
     modalTitulo.textContent = modelos[tipo].titulo;
     modalCampos.innerHTML = modelos[tipo].campos;
 
-    if (tipo === "grupo") prepararModalGrupo();
+    if (tipo === "grupo" || tipo === "participantes") prepararModalGrupo();
 
     modal.showModal();
 }
@@ -1336,6 +1368,29 @@ formModal.addEventListener("submit", event => {
         }
 
         criarGrupo(nomeGrupo, [...contatosGrupo]);
+    }
+
+    if (tipoModal === "participantes") {
+        const conversa = obterConversa();
+        if (!conversa || conversa.tipo !== "grupo") return;
+
+        // Inclui o contato preenchido que ainda não foi adicionado com o botão
+        const nomePendente = (document.getElementById("grupoContatoNome")?.value || "").trim();
+        const numeroPendente = (document.getElementById("grupoContatoNumero")?.value || "").trim();
+        const repetido = numeroPendente && (
+            contatosGrupo.some(c => c.telefone === numeroPendente) ||
+            (conversa.membros || []).some(c => c.telefone === numeroPendente)
+        );
+        if (nomePendente && numeroPendente && !repetido) {
+            contatosGrupo.push({ nome: nomePendente, telefone: numeroPendente });
+        }
+
+        if (!contatosGrupo.length) {
+            alert("Adicione pelo menos um contato.");
+            return;
+        }
+
+        adicionarParticipantes(conversa, [...contatosGrupo]);
     }
 
     fecharModal();

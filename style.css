@@ -1142,6 +1142,18 @@ dialog::backdrop {
 /* NOVO GRUPO (adicionar contatos) */
 
 
+.add-members {
+    width: auto;
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.add-members[hidden] {
+    display: none !important;
+}
+
 .group-add {
     display: grid;
     grid-template-columns: 1fr 1fr;
