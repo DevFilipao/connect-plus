@@ -384,7 +384,6 @@ document.getElementById("novoChat").addEventListener("click", () => {
 function criarConversa(nome, telefone) {
     const nova = {
         id: gerarId(),
-        nome,
         telefone,
         avatar: nome.charAt(0).toUpperCase(),
         descricao: telefone,
