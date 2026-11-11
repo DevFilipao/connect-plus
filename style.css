@@ -123,8 +123,25 @@ button {
     color: white;
     padding: 14px;
     font-weight: 600;
+    margin-bottom: 10px;
+    transition: 0.2s;
+}
+
+
+.new-group {
+    border: 1px solid var(--primary);
+    border-radius: 11px;
+    background: transparent;
+    color: #9cc4ff;
+    padding: 13px;
+    font-weight: 600;
     margin-bottom: 25px;
     transition: 0.2s;
+}
+
+
+.new-group:hover {
+    background: var(--primary-light);
 }
 
 
@@ -1122,6 +1139,71 @@ dialog::backdrop {
 }
 
 
+/* NOVO GRUPO (adicionar contatos) */
+
+
+.group-add {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+
+.group-add-button {
+    margin-top: 10px;
+}
+
+
+.group-contacts {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 190px;
+    overflow-y: auto;
+}
+
+
+.group-contact {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #0a1626;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+
+.small-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+
+.group-contact-info {
+    flex: 1;
+    min-width: 0;
+}
+
+
+.group-contact-info strong {
+    display: block;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.group-contact-info small {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+
 /* RESPONSIVIDADE */
 
 
@@ -1161,6 +1243,7 @@ dialog::backdrop {
 
     .logo > div:last-child,
     .new-chat,
+    .new-group,
     .sidebar-title,
     .menu-item:not(.active) > span:not(:first-child),
     .menu-item {
@@ -1300,6 +1383,11 @@ dialog::backdrop {
 
 
     .task-stats {
+        grid-template-columns: 1fr;
+    }
+
+
+    .group-add {
         grid-template-columns: 1fr;
     }
 }

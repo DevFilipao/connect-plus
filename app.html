@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
- 
- 
+
+
     <div class="app">
         <aside class="sidebar">
             <div class="logo">
@@ -19,14 +19,15 @@
                     <h1>Connect<span>+</span></h1>
                 </div>
             </div>
- 
- 
+
+
             <button class="new-chat" id="novoChat">＋ Nova conversa</button>
- 
- 
+            <button class="new-group" id="novoGrupo">👥 Novo grupo</button>
+
+
             <div class="sidebar-title">MENU</div>
- 
- 
+
+
             <button class="menu-item active" data-view="chat">
                 <span>💬</span> Conversas
             </button>
@@ -43,14 +44,14 @@
             <button class="menu-item" data-view="memoria">
                 <span>🧠</span> Memória inteligente
             </button>
- 
- 
+
+
             <div class="sidebar-title">CONVERSAS</div>
             <div class="chat-list" id="listaConversas"></div>
- 
+
         </aside>
- 
- 
+
+
         <main class="main">
             <header class="topbar">
                 <div>
@@ -61,8 +62,8 @@
                     <span class="status"><span></span> Connect+ ativo</span>
                 </div>
             </header>
- 
- 
+
+
             <section class="view active" id="view-chat">
                 <div class="chat-layout">
                     <div class="conversation">
@@ -74,11 +75,11 @@
                             </div>
                             <button class="icon-button" id="verInfo" title="Informações">ⓘ</button>
                         </div>
- 
- 
+
+
                         <div class="messages" id="mensagens"></div>
- 
- 
+
+
                         <div class="suggestion" id="sugestao" hidden>
                             <div class="suggestion-icon">✨</div>
                             <div class="suggestion-content">
@@ -90,8 +91,8 @@
                                 </div>
                             </div>
                         </div>
- 
- 
+
+
                         <form class="message-form" id="formMensagem">
                             <input type="text" id="campoMensagem"
                                 placeholder="Digite sua mensagem..."
@@ -100,8 +101,8 @@
                         </form>
                         <div class="chat-hint">✨ O Connect+ pode identificar tarefas e compromissos nas mensagens.</div>
                     </div>
- 
- 
+
+
                     <aside class="right-panel">
                         <div class="panel-card">
                             <div class="panel-heading">
@@ -116,8 +117,8 @@
                             <div id="resumoAtividades"></div>
                             <button class="text-button" data-go="tarefas">Ver todas as tarefas →</button>
                         </div>
- 
- 
+
+
                         <div class="panel-card memory-card">
                             <div class="panel-heading">
                                 <h3>🧠 Memória inteligente</h3>
@@ -129,8 +130,8 @@
                     </aside>
                 </div>
             </section>
- 
- 
+
+
             <section class="view" id="view-tarefas">
                 <div class="page-content">
                     <div class="page-heading">
@@ -144,8 +145,8 @@
                     <div class="task-list" id="listaTarefas"></div>
                 </div>
             </section>
- 
- 
+
+
             <section class="view" id="view-eventos">
                 <div class="page-content">
                     <div class="page-heading">
@@ -158,8 +159,8 @@
                     <div class="event-list" id="listaEventos"></div>
                 </div>
             </section>
- 
- 
+
+
             <section class="view" id="view-enquetes">
                 <div class="page-content">
                     <div class="page-heading">
@@ -172,8 +173,8 @@
                     <div class="poll-list" id="listaEnquetes"></div>
                 </div>
             </section>
- 
- 
+
+
             <section class="view" id="view-memoria">
                 <div class="page-content">
                     <div class="page-heading">
@@ -187,8 +188,8 @@
             </section>
         </main>
     </div>
- 
- 
+
+
     <dialog id="modal">
         <form id="formModal" class="modal-form">
             <div class="modal-header">
@@ -202,9 +203,9 @@
             </div>
         </form>
     </dialog>
- 
- 
+
+
     <script src="app.js"></script>
- 
+
 </body>
 </html>
