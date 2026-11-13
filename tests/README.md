@@ -37,9 +37,6 @@ Os testes com nome **"BUG CONHECIDO"** fixam bugs que decidimos não corrigir ag
 
 | Bug | Teste |
 |---|---|
-| D4: o assistente não roda ao enviar pelo chat | `integracao/assistente.test.js` |
-| D5: criar tarefa com conversa da API aberta troca o painel pela conversa da IA | `integracao/app.test.js` |
-| D6: a memória é apagada a cada carregamento | `integracao/app.test.js` |
 | D7: a conversa da IA consulta a API com `conversaId: 1` | `integracao/chat.test.js` |
 | D8: `id="erro-contato"` duplicado no modal | `integracao/app.test.js` |
 | "amanhã" com til não é reconhecido (`\b` + `ã`) | `unit/compromisso.test.js` |
@@ -67,6 +64,11 @@ O `test:cov:ui` é conservador: uma linha só conta se estiver inteira executada
 | F4 (assistente e votação extraídos) | 86,9% (`js/dominio/*` fora da conta: ≥ 96% em `test:cov`) |
 | F5 (repositorio.js extraído) | 87,2% (inclui `repositorio.js`; 100% em `test:cov`) |
 | F6 (app.js dividido) | 87,2% (igual: só movimentação) |
-
-Depois da F6, a cobertura por arquivo mostra onde está o que falta: `conversas.js` 28% (chat local antigo, inalcançável pela interface, D4) e `modal.js` 72% (ramos de grupos, que dependem do bloco comentado de `app.js`). Os demais módulos de funcionalidade estão entre 91% e 100%.
 | F7 (auth/login desacoplados) | 87,1% (`auth.js` 95,8%, `login.js` 93,8%) |
+| F8 (assistente nas conversas reais) | 91,1% (`quadro.js` 94,3%, `sugestao.js` 92,6%, `chat.js` 90,1%) |
+
+O que ainda falta de cobertura está quase todo em `modal.js` (73%): são os ramos de grupos, que dependem do bloco comentado de `app.js`.
+
+## Bugs corrigidos pela F8
+
+D4 (o assistente não rodava ao enviar pelo chat), D5 (criar tarefa ou evento trocava o painel da conversa aberta) e D6 (a memória era apagada a cada carregamento) deixaram de existir. Os testes que os fixavam foram invertidos: agora afirmam o comportamento correto, em `integracao/assistente.test.js` e `integracao/app.test.js`, e o fluxo completo é conferido no navegador em `e2e/assistente.spec.js`.

@@ -235,6 +235,48 @@ describe("quadro do compromisso", () => {
         } finally { volta.fechar(); }
     });
 
+    test("depois de recarregar, o quadro continua entre as mensagens e não vai para o fim", async () => {
+        const api = criarApiFalsa();
+        const p = await carregarApp({ api });
+        let salvo;
+        try {
+            await abrir(p);
+            await enviar(p, FRASE);
+            await esperar(QUADRO_MS);
+            api.estado.mensagens.push({ id: 200, conversaId: 10, de: "11911112222", nome: "João Lima", texto: "Fechado!", dataHora: "2026-11-11T13:05:00.000Z" });
+            salvo = guardado(p);
+        } finally { p.fechar(); }
+
+        const volta = await carregarApp({ api, local: salvo });
+        try {
+            await abrir(volta);
+            assert.deepEqual(ordem(volta), ["Oi, Maria!", FRASE, "[quadro] Jogo · Sábado", "Fechado!"]);
+        } finally { volta.fechar(); }
+    });
+
+    test("quadro criado pelo modal de evento também fica ancorado e continua no lugar depois de recarregar", async () => {
+        const api = criarApiFalsa();
+        const p = await carregarApp({ api });
+        let salvo;
+        try {
+            await abrir(p);
+            p.clicar("#novoEvento");
+            p.$("#modalCampos #titulo").value = "Festa";
+            p.$("#modalCampos #data").value = "2026-12-20";
+            p.submeter("#formModal");
+            await esperar(QUADRO_MS);
+            assert.equal(p.lerLocal("connect_quadros")["10"][0].depoisDe, 1);
+            api.estado.mensagens.push({ id: 200, conversaId: 10, de: "11911112222", nome: "João Lima", texto: "Fechado!", dataHora: "2026-11-11T13:05:00.000Z" });
+            salvo = guardado(p);
+        } finally { p.fechar(); }
+
+        const volta = await carregarApp({ api, local: salvo });
+        try {
+            await abrir(volta);
+            assert.deepEqual(ordem(volta), ["Oi, Maria!", "[quadro] Festa", "Fechado!"]);
+        } finally { volta.fechar(); }
+    });
+
     test("quadro guardado cuja mensagem não existe mais vai para o fim da conversa", async () => {
         const orfao = { id: 7, titulo: "Festa", data: "", horario: "", local: "", opcoes: [{ texto: "Vou", votos: 0 }], voto: null, salvo: false, depoisDe: 999, hora: "10:00" };
         const p = await carregarApp({ local: { connect_quadros: { 10: [orfao] } } });

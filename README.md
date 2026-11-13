@@ -101,7 +101,7 @@ connect-plus/
     ├── auth.js     entrar, cadastrar, sair e exigir login (sem DOM)
     ├── chat.js     conversas ligadas à API
     ├── app.js      base da tela do app: elementos, estado, navegação e resumo de atividades
-    ├── conversas.js, quadro.js, sugestao.js    chat local, quadro do compromisso e sugestões do assistente
+    ├── quadro.js, sugestao.js    quadro do compromisso (por conversa) e sugestões do assistente
     ├── tarefas.js, eventos.js, enquetes.js, memoria.js    uma tela por arquivo
     ├── modal.js    janelas de criação e seus formulários
     ├── inicio.js   primeira renderização (carrega por último entre os scripts do app)
