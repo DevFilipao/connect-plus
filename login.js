@@ -1,5 +1,8 @@
+// const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyZUaQxHXB7PHBjK5lwf8LhJogyWpLzBzrCZ7hVG5DifpzlPZ8V8QRGtGsRpuSkiKGd/exec";
 
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyZUaQxHXB7PHBjK5lwf8LhJogyWpLzBzrCZ7hVG5DifpzlPZ8V8QRGtGsRpuSkiKGd/exec";
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
 
 function mostrarSenha(id, botao) {
     const campo = document.getElementById(id);
@@ -13,37 +16,95 @@ function mostrarSenha(id, botao) {
     }
 }
 
-// Máscara do telefone
-const telefone = document.getElementById("telefone");
 
-telefone.addEventListener("input", function () {
-    let valor = telefone.value.replace(/\D/g, "");
 
-    if (valor.length > 11) {
-        valor = valor.substring(0, 11);
-    }
+/* ============================================================
+   ABAS: ENTRAR / CRIAR CONTA
+   ============================================================ */
 
-    if (valor.length > 6) {
-        telefone.value =
-            "(" + valor.substring(0, 2) + ") " +
-            valor.substring(2, 7) + "-" +
-            valor.substring(7);
-    } else if (valor.length > 2) {
-        telefone.value =
-            "(" + valor.substring(0, 2) + ") " +
-            valor.substring(2);
+const formLogin = document.getElementById("formularioLogin");
+const formCadastro = document.getElementById("formulario");
+const abaLogin = document.getElementById("abaLogin");
+const abaCadastro = document.getElementById("abaCadastro");
+const tituloPagina = document.getElementById("tituloPagina");
+const subtituloPagina = document.getElementById("subtituloPagina");
+const mensagem = document.getElementById("mensagem");
+
+
+function mudarModo(modo) {
+    
+    const ehLogin = modo === "login";
+
+    formularioLogin.style.display = ehLogin ? "block" : "none";
+    formulario.style.display = ehLogin ? "none" : "block";
+
+    abaLogin.classList.toggle("ativa", ehLogin);
+    abaCadastro.classList.toggle("ativa", !ehLogin);
+    abaLogin.setAttribute("aria-selected", ehLogin);
+    abaCadastro.setAttribute("aria-selected", !ehLogin);
+
+    if (ehLogin) {
+        tituloPagina.textContent = "Entrar na sua conta";
+        subtituloPagina.textContent =
+            "Use seu número e sua senha para acessar";
     } else {
-        telefone.value = valor;
+        tituloPagina.textContent = "Crie sua conta";
+        subtituloPagina.textContent = "Preencha seus dados para começar";
     }
+
+    mensagem.style.display = "none";
+
+    try {
+        sessionStorage.setItem("modoAuth", modo);
+    } catch (e) {}
+}
+
+abaLogin.addEventListener("click", function () { mudarModo("login"); });
+abaCadastro.addEventListener("click", function () { mudarModo("cadastro"); });
+
+document.getElementById("irCadastro").addEventListener("click", function (e) {
+    e.preventDefault();
+    mudarModo("cadastro");
 });
 
-// Termos de uso
+document.getElementById("irLogin").addEventListener("click", function (e) {
+    e.preventDefault();
+    mudarModo("login");
+});
+
+// Restaura a aba em que a pessoa estava (ex.: voltou da página de termos)
+(function () {
+    let modo = "login";
+
+    try {
+        modo = sessionStorage.getItem("modoAuth") || "login";
+    } catch (e) {}
+
+    mudarModo(modo);
+})();
+
+/* ============================================================
+   MÁSCARAS DE TELEFONE
+   ============================================================ */
+
+const telefone = document.getElementById("telefone");
+const loginNumero = document.getElementById("loginNumero");
+
+aplicarMascaraTelefone(telefone);
+aplicarMascaraTelefone(loginNumero);
+
+/* ============================================================
+   TERMOS DE USO (cadastro e login)
+   ============================================================ */
+
 const campoTermos = document.getElementById("termos");
+const campoTermosLogin = document.getElementById("termosLogin");
 
 function verificarTermosAceitos() {
     try {
         if (sessionStorage.getItem("termosAceitos") === "sim") {
             campoTermos.checked = true;
+            campoTermosLogin.checked = true;
         }
     } catch (e) {}
 }
@@ -52,8 +113,11 @@ verificarTermosAceitos();
 
 window.addEventListener("pageshow", verificarTermosAceitos);
 
-// Rascunho do cadastro
-const camposRascunho = ["nome", "telefone", "email"];
+/* ============================================================
+   RASCUNHO (cadastro + login)
+   ============================================================ */
+
+const camposRascunho = ["nome", "telefone", "email", "loginNumero"];
 
 function salvarRascunho() {
     try {
@@ -93,121 +157,4 @@ restaurarRascunho();
 document.querySelectorAll(".termos a").forEach(function (link) {
     link.addEventListener("click", salvarRascunho);
 });
-
-// Enviar perfil para o Google Sheets
-async function salvarPerfilNaPlanilha(nome, telefone) {
-    const resposta = await fetch(GOOGLE_SHEETS_URL, {
-        method: "POST",
-        body: JSON.stringify({
-            acao: "perfil",
-            nome: nome,
-            telefone: telefone
-        })
-    });
-
-    const resultado = await resposta.json();
-
-    if (!resultado.sucesso) {
-        throw new Error(
-            resultado.erro || "Não foi possível salvar o cadastro."
-        );
-    }
-
-    return resultado;
-}
-
-// Envio do formulário
-const formulario = document.getElementById("formulario");
-
-formulario.addEventListener("submit", async function (event) {
-    event.preventDefault();
-
-    const nome = document.getElementById("nome").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const senha = document.getElementById("senha").value;
-    const confirmarSenha =
-        document.getElementById("confirmarSenha").value;
-    const mensagem = document.getElementById("mensagem");
-
-    if (senha !== confirmarSenha) {
-        alert("As senhas não são iguais!");
-        return;
-    }
-
-    if (senha.length < 6) {
-        alert("A senha precisa ter pelo menos 6 caracteres!");
-        return;
-    }
-
-    if (telefone.value.replace(/\D/g, "").length < 10) {
-        alert("Digite um telefone válido com DDD!");
-        return;
-    }
-
-    if (!campoTermos.checked) {
-        alert(
-            "Para continuar, aceite os Termos de Uso e a Política de Privacidade."
-        );
-        return;
-    }
-
-    const telefoneFormatado = telefone.value;
-    const telefoneLimpo = telefone.value.replace(/\D/g, "");
-
-    const botaoEnviar = formulario.querySelector(
-        'button[type="submit"], input[type="submit"]'
-    );
-
-    try {
-        if (botaoEnviar) {
-            botaoEnviar.disabled = true;
-        }
-
-        mensagem.style.display = "block";
-        mensagem.textContent = "Salvando seu cadastro...";
-        
-        // Salva o perfil na planilha e recebe o ID
-        const resultado = await salvarPerfilNaPlanilha(
-            nome,
-            telefoneFormatado
-        );
-
-        // Guarda também o ID do usuário no navegador
-        localStorage.setItem("connect_usuario", JSON.stringify({
-            id: resultado.id,
-            nome: nome,
-            telefone: telefoneFormatado,
-            email: email
-        }));
-
-
-        sessionStorage.removeItem("rascunhoCadastro");
-        sessionStorage.removeItem("termosAceitos");
-
-        mensagem.textContent = "Cadastro realizado com sucesso!";
-
-        formulario.reset();
-
-        setTimeout(function () {
-            window.location.href = "app.html";
-        }, 1200);
-
-    } catch (erro) {
-        console.error("Erro ao salvar cadastro:", erro);
-
-        mensagem.textContent = "";
-        mensagem.style.display = "none";
-
-        alert(
-            "Não foi possível salvar seu cadastro na planilha. " +
-            "Confira sua conexão e tente novamente."
-        );
-
-    } finally {
-        if (botaoEnviar) {
-            botaoEnviar.disabled = false;
-        }
-    }
-});
-
 

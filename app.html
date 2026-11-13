@@ -49,7 +49,8 @@
 
 
             <div class="sidebar-title">CONVERSAS</div>
-            <div class="chat-list" id="listaConversas"></div>
+            <p id="erro-contato" class="erro" role="alert"></p>
+            <div class="chat-list" id="listaConversas" data-origem="api"></div>
 
         </aside>
 
@@ -60,8 +61,9 @@
                     <h2 id="tituloPagina">Conversas</h2>
                     <p id="subtituloPagina">Converse e organize sua rotina.</p>
                 </div>
-                <div class="top-actions">
-                    <span class="status"><span></span> Connect+ ativo</span>
+                <div class="top-actions" style="display: flex; align-items: center; gap: 12px;">
+                    <strong id="meu-nome"></strong>
+                    <button id="btn-sair" class="new-chat" type="button">Sair</button>
                 </div>
             </header>
 
@@ -96,7 +98,7 @@
                         </div>
 
 
-                        <form class="message-form" id="formMensagem">
+                        <form class="message-form" id="formMensagem" data-origem="api">
                             <input type="text" id="campoMensagem"
                                 placeholder="Digite sua mensagem..."
                                 autocomplete="off" required>
@@ -207,8 +209,12 @@
         </form>
     </dialog>
 
-
+    <script src="js/util.js"></script>
     <script src="app.js"></script>
 
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/chat.js"></script>
 </body>
 </html>

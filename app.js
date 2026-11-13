@@ -1,47 +1,3 @@
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyZUaQxHXB7PHBjK5lwf8LhJogyWpLzBzrCZ7hVG5DifpzlPZ8V8QRGtGsRpuSkiKGd/exec";
-
-async function consultarPlanilha(acao) {
-    const url = `${GOOGLE_SHEETS_URL}?acao=${encodeURIComponent(acao)}`;
-    const resposta = await fetch(url);
-    const resultado = await resposta.json();
-
-    if (!resultado.sucesso) {
-        throw new Error(resultado.erro || "Erro ao consultar a planilha.");
-    }
-
-    return resultado.dados || [];
-}
-
-async function salvarNaPlanilha(dados) {
-    const resposta = await fetch(GOOGLE_SHEETS_URL, {
-        method: "POST",
-        body: JSON.stringify(dados)
-    });
-
-    const resultado = await resposta.json();
-
-    if (!resultado.sucesso) {
-        throw new Error(resultado.erro || "Erro ao salvar na planilha.");
-    }
-
-    return resultado;
-}
-
-async function testarLeituraPlanilha() {
-    try {
-        const perfis = await consultarPlanilha("perfis");
-        console.log("Perfis recebidos da planilha:", perfis);
-        alert(`Conexão funcionando! Perfis encontrados: ${perfis.length}`);
-    } catch (erro) {
-        console.error("Erro ao consultar a planilha:", erro);
-        alert("Não foi possível ler a planilha. Confira o console.");
-    }
-}
-
-// Para testar a conexão com a planilha, rode testarLeituraPlanilha() no console.
-
-
-
 
 const mensagens = document.getElementById("mensagens");
 const campoMensagem = document.getElementById("campoMensagem");
@@ -56,7 +12,6 @@ const formModal = document.getElementById("formModal");
 
 // DADOS SALVOS NO NAVEGADOR
 
-
 function carregarDados(chave, padrao) {
     try {
         const dados = localStorage.getItem(chave);
@@ -65,7 +20,6 @@ function carregarDados(chave, padrao) {
         return padrao;
     }
 }
-
 
 // Usuário criado na página de cadastro (index.html)
 const usuario = carregarDados("connect_usuario", null);
@@ -87,9 +41,6 @@ localStorage.removeItem("connect_conversas");
 // Os grupos criados continuam salvos no navegador
 const gruposSalvos = carregarDados("connect_grupos", []);
 let conversas = [CONVERSA_IA, ...gruposSalvos];
-
-
-
 
 let tarefas = carregarDados("connect_tarefas", []);
 let eventos = carregarDados("connect_eventos", []);
@@ -201,29 +152,7 @@ const titulos = {
 };
 
 
-function abrirPagina(pagina) {
-    document.querySelectorAll(".view").forEach(view => {
-        view.classList.remove("active");
-    });
 
-
-    document.getElementById(`view-${pagina}`).classList.add("active");
-
-
-    document.querySelectorAll(".menu-item").forEach(botao => {
-        botao.classList.toggle("active", botao.dataset.view === pagina);
-    });
-
-
-    document.getElementById("tituloPagina").textContent = titulos[pagina][0];
-    document.getElementById("subtituloPagina").textContent = titulos[pagina][1];
-
-
-    if (pagina === "tarefas") renderizarTarefas();
-    if (pagina === "eventos") renderizarEventos();
-    if (pagina === "enquetes") renderizarEnquetes();
-    if (pagina === "memoria") renderizarMemoria();
-}
 
 
 document.querySelectorAll(".menu-item").forEach(botao => {
@@ -239,9 +168,11 @@ document.querySelectorAll("[data-go]").forEach(botao => {
 // CONVERSAS
 
 
+
+
 function renderizarListaConversas() {
     const lista = document.getElementById("listaConversas");
-    if (!lista) return; // a lista lateral de conversas foi removida
+    if (!lista || lista.dataset.origem === "api") return;
 
 
     lista.innerHTML = conversas.map(conversa => {
@@ -359,6 +290,8 @@ async function enviarMensagem(texto) {
 formulario.addEventListener("submit", async event => {
     event.preventDefault();
 
+    if (formulario.dataset.origem === "api") return;
+
 
     const texto = campoMensagem.value.trim();
     if (!texto) return;
@@ -379,6 +312,8 @@ formulario.addEventListener("submit", async event => {
 
 document.getElementById("novoChat").addEventListener("click", () => {
     abrirModal("chat");
+    var campoTelefone = document.getElementById('novo-telefone');
+    aplicarMascaraTelefone(campoTelefone);
 });
 
 function criarConversa(nome, telefone) {
@@ -405,7 +340,7 @@ function criarConversa(nome, telefone) {
 
 // CRIAR NOVO GRUPO
 
-
+/** Cria um novo grupo de conversa. 
 document.getElementById("novoGrupo").addEventListener("click", () => {
     abrirModal("grupo");
 });
@@ -433,7 +368,6 @@ function criarGrupo(nome, contatos) {
     renderizarChat();
     abrirPagina("chat");
 }
-
 
 // ADICIONAR PARTICIPANTES A UM GRUPO JÁ CRIADO
 
@@ -532,6 +466,7 @@ function prepararModalGrupo() {
     });
 }
 
+*/
 
 // QUADRO DE COMPROMISSO FEITO PELA IA
 
@@ -1181,7 +1116,7 @@ function renderizarResumoAtividades() {
 
 
 function campoFormulario(nome, rotulo, tipo = "text", valor = "", obrigatorio = true) {
-    const id = `campo-${nome}`;
+    const id = `${nome}`;
     const required = obrigatorio ? "required" : "";
 
 
@@ -1200,9 +1135,24 @@ function campoFormulario(nome, rotulo, tipo = "text", valor = "", obrigatorio = 
             <label for="${id}">${escaparHTML(rotulo)}</label>
             <input id="${id}" name="${nome}" type="${tipo}"
                 value="${escaparHTML(valor)}" ${required}>
+            <p id="erro-contato" class="erro" role="alert"></p>
         </div>
     `;
 }
+
+function campoFormularioTelefone(nome, rotulo, obrigatorio = true) {
+    const id = `${nome}`;
+    const required = obrigatorio ? "required" : "";
+    
+    return `
+        <div class="form-field">
+            <label for="${id}">${escaparHTML(rotulo)}</label>
+            <input id="${id}" name="${nome}" type="tel" ${required}>
+            <p id="erro-modal" class="erro" role="alert"></p>
+        </div>
+    `;
+}
+
 
 function abrirModal(tipo, dados = {}) {
     tipoModal = tipo;
@@ -1235,10 +1185,8 @@ function abrirModal(tipo, dados = {}) {
         },
         chat: {
             titulo: "Nova conversa",
-            campos:
-                campoFormulario("nome", "Nome", "text", "") +
-                campoFormulario("telefone", "Número", "tel", "")
-        },
+            campos: campoFormularioTelefone("novo-telefone", "Número")
+        }/** ,
         grupo: {
             titulo: "Novo grupo",
             campos:
@@ -1253,14 +1201,14 @@ function abrirModal(tipo, dados = {}) {
                     <div class="group-contacts" id="grupoContatos"></div>
                 </div>
             `
-        }
+        }*/
     };
 
     // Mesmo bloco de contatos do "Novo grupo", mas sem o campo do nome
-    modelos.participantes = {
+   /** modelos.participantes = {
         titulo: "Adicionar participantes",
         campos: modelos.grupo.campos.replace(campoFormulario("nomeGrupo", "Nome", "text", ""), "")
-    };
+    };*/ 
 
     modalTitulo.textContent = modelos[tipo].titulo;
     modalCampos.innerHTML = modelos[tipo].campos;
@@ -1292,6 +1240,8 @@ modal.addEventListener("click", event => {
 
 formModal.addEventListener("submit", event => {
     event.preventDefault();
+
+    if (tipoModal === "chat") return;
 
     const dados = Object.fromEntries(new FormData(formModal).entries());
     const texto = campo => (dados[campo] || "").trim();
@@ -1332,18 +1282,6 @@ formModal.addEventListener("submit", event => {
         }
 
         adicionarEnquete(texto("pergunta"), opcoes);
-    }
-
-    if (tipoModal === "chat") {
-        const nome = texto("nome");
-        const telefone = texto("telefone");
-
-        if (!nome || !telefone) {
-            alert("Informe o nome e o número do contato.");
-            return;
-        }
-
-        criarConversa(nome, telefone);
     }
 
     if (tipoModal === "grupo") {
