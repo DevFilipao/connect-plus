@@ -273,6 +273,11 @@ document.getElementById('novoChat').addEventListener('click', function () {
 });
 
 document.getElementById('verInfo').addEventListener('click', function () {
+  if (conversaSelecionada) {
+    alert(conversaSelecionada.nome + '\n' + conversaSelecionada.telefone);
+    return;
+  }
+
   var conversa = obterConversa();
   if (!conversa) return;
 

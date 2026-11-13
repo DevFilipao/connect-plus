@@ -136,6 +136,38 @@ describe("chat.js: conversa", () => {
     });
 });
 
+describe("chat.js: botão de informações (ⓘ)", () => {
+    test("com uma conversa aberta, mostra o nome e o telefone dela", async () => {
+        const p = await carregarApp();
+        try {
+            p.clicar(conversa(p, "João Lima"));
+            await assentar();
+            p.clicar("#verInfo");
+            assert.deepEqual(p.alertas, ["João Lima\n11911112222"]);
+        } finally { p.fechar(); }
+    });
+
+    test("trocando de conversa, mostra a da vez", async () => {
+        const p = await carregarApp();
+        try {
+            p.clicar(conversa(p, "João Lima"));
+            await assentar();
+            p.clicar(conversa(p, "CONNECT+ AI"));
+            await assentar();
+            p.clicar("#verInfo");
+            assert.deepEqual(p.alertas, ["CONNECT+ AI\nChat privado com a IA"]);
+        } finally { p.fechar(); }
+    });
+
+    test("sem nenhuma conversa aberta, mostra a conversa local da IA", async () => {
+        const p = await carregarApp();
+        try {
+            p.clicar("#verInfo");
+            assert.deepEqual(p.alertas, ["CONNECT+ AI\nChat privado com a IA"]);
+        } finally { p.fechar(); }
+    });
+});
+
 describe("chat.js: nova conversa e sair", () => {
     test("abrir conversa por telefone (modal) → chamada abrirConversa com o valor mascarado", async () => {
         const p = await carregarApp();
