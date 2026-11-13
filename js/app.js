@@ -1,15 +1,9 @@
 const mensagens = document.getElementById("mensagens");
-const campoMensagem = document.getElementById("campoMensagem");
-const formulario = document.getElementById("formMensagem");
 const sugestao = document.getElementById("sugestao");
 const textoSugestao = document.getElementById("textoSugestao");
 
 
 const repositorio = criarRepositorio(localStorage);
-
-// Usuário logado (sessão salva em js/storage.js)
-const usuario = Sessao.ler();
-const nomeUsuario = (usuario && usuario.nome ? usuario.nome.trim().split(" ")[0] : "") || "Maria";
 
 
 const CONVERSA_IA = {
@@ -288,7 +282,6 @@ function renderizarResumoAtividades() {
 
 function atualizarTudo() {
     salvarDados();
-    renderizarListaConversas();
     renderizarChat();
     renderizarTarefas();
     renderizarEventos();

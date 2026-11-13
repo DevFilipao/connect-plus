@@ -267,6 +267,27 @@ el.formMsg.addEventListener('submit', async function (ev) {
 });
 
 
+document.getElementById('novoChat').addEventListener('click', function () {
+  abrirModal('chat');
+  aplicarMascaraTelefone(document.getElementById('novo-telefone'));
+});
+
+document.getElementById('verInfo').addEventListener('click', function () {
+  var conversa = obterConversa();
+  if (!conversa) return;
+
+  if (conversa.tipo === 'grupo') {
+    var lista = (conversa.membros || [])
+      .map(function (m) { return '• ' + m.nome + ' - ' + m.telefone; })
+      .join('\n');
+    alert(conversa.nome + '\n' + conversa.descricao + '\n\nParticipantes:\n• Você\n' + lista);
+    return;
+  }
+
+  alert(conversa.nome + '\n' + conversa.descricao);
+});
+
+
 // ---------------------------------------------------------------- início
 
 if (sessao) {

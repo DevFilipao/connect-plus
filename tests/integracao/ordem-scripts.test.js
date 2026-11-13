@@ -80,7 +80,7 @@ describe("login.html: ordem dos scripts", () => {
 
 test("cada módulo de funcionalidade foi carregado e define suas funções", async () => {
     const esperado = {
-        "js/conversas.js": ["renderizarListaConversas", "renderizarChat", "enviarMensagem"],
+        "js/conversas.js": ["renderizarChat"],
         "js/quadro.js": ["publicarQuadro", "htmlQuadro", "acharQuadro"],
         "js/sugestao.js": ["analisarMensagem", "mostrarSugestao"],
         "js/tarefas.js": ["adicionarTarefa", "renderizarTarefas"],

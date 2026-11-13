@@ -27,7 +27,6 @@ function publicarQuadro(compromisso, { conversaId, salvo = false } = {}) {
         });
 
         salvarDados();
-        renderizarListaConversas();
         if (conversaAtual === conversa.id) renderizarChat();
     }, 700);
 }
