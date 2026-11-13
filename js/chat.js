@@ -224,8 +224,6 @@ el.formContato.addEventListener('submit', async function (ev) {
   var campoTelefone = document.getElementById('novo-telefone');
   if (!campoTelefone) return;
 
-  aplicarMascaraTelefone(campoTelefone);
-
   var erroModal = document.getElementById('erro-modal');
   erroModal.textContent = '';
   try {

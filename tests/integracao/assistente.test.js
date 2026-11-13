@@ -1,4 +1,4 @@
-// Caracterização do assistente simulado (js/app.js:478-804).
+// Caracterização do assistente simulado (bloco "QUADRO DE COMPROMISSO" até "TAREFAS" em js/app.js).
 // Hoje ele é INALCANÇÁVEL pela interface (D4): analisarMensagem é chamada aqui direto de `window`.
 // Na F4 a classificação vai para js/dominio/assistente.js; na F8 (opcional) ele é religado ao chat.
 const { test, describe } = require("node:test");

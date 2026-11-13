@@ -56,4 +56,8 @@ Os testes com nome **"BUG CONHECIDO"** fixam bugs que decidimos não corrigir ag
 | `app.js` | 81,9% | `npm run test:cov:ui` |
 | **UI (todos via jsdom)** | **85,2%** | `npm run test:cov:ui` |
 
-O `test:cov:ui` é conservador: uma linha só conta se estiver inteira executada. O que falta em `app.js` é quase todo código morto ou inalcançável: o chat local (200–345), os grupos (1294–1339) e a `ConnectAI` (1380–1458).
+O `test:cov:ui` é conservador: uma linha só conta se estiver inteira executada. A tabela acima é a base **antes da refatoração**. O que faltava em `app.js` era quase todo código morto ou inalcançável: o chat local, os grupos e a `ConnectAI`.
+
+| Depois da fase | UI (todos via jsdom) |
+|---|---|
+| F2 (código morto removido) | 89,1% |

@@ -1,4 +1,4 @@
-// Caracterização de extrairCompromisso (js/app.js:511-564).
+// Caracterização de extrairCompromisso (js/app.js).
 // Hoje a função só existe dentro de app.js; ela é lida de `window` com app.html carregado.
 // "Agora" fixo: quarta-feira, 11/11/2026, 10:00 (America/Sao_Paulo).
 // Na F4 ela passa a ser um require de js/dominio/compromisso.js, e esta tabela não muda.
@@ -42,17 +42,17 @@ for (const [frase, esperado] of TABELA) {
     });
 }
 
-test("BUG CONHECIDO: 'amanhã' com til não é reconhecido (\\b do JS não trata 'ã' como letra, app.js:529)", () => {
+test("BUG CONHECIDO: 'amanhã' com til não é reconhecido (\\b do JS não trata 'ã' como letra, regex de 'amanhã' em extrairCompromisso)", () => {
     assert.deepEqual(extrair("Reunião amanhã 14:30 na Sala Azul"),
         { titulo: "Reunião", data: "", horario: "14:30", local: "Sala Azul" });
 });
 
-test("BUG CONHECIDO: 'às 10' sem 'h' não vira horário (\\bàs nunca casa, app.js:550)", () => {
+test("BUG CONHECIDO: 'às 10' sem 'h' não vira horário (\\bàs nunca casa, regex de horário em extrairCompromisso)", () => {
     assert.deepEqual(extrair("Reunião às 10 no Escritório"),
         { titulo: "Reunião", data: "", horario: "", local: "Escritório" });
 });
 
-test("BUG CONHECIDO: data inexistente (31/02) é aceita sem validação (app.js:523-528)", () => {
+test("BUG CONHECIDO: data inexistente (31/02) é aceita sem validação (regex de data explícita em extrairCompromisso)", () => {
     assert.equal(extrair("jogo 31/02").data, "2026-02-31");
 });
 

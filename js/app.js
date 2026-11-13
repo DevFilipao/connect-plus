@@ -132,14 +132,6 @@ function criarVazio(titulo, descricao) {
 }
 
 
-// PERFIL (nome e inicial vindos do cadastro)
-
-
-function renderizarPerfil() {
-    // O rodapé agora mostra apenas a logo do Connect+ (sem nome de usuário).
-}
-
-
 // NAVEGAÇÃO
 
 
@@ -322,28 +314,6 @@ document.getElementById("novoChat").addEventListener("click", () => {
     var campoTelefone = document.getElementById('novo-telefone');
     aplicarMascaraTelefone(campoTelefone);
 });
-
-function criarConversa(nome, telefone) {
-    const nova = {
-        id: gerarId(),
-        nome,
-        telefone,
-        avatar: nome.charAt(0).toUpperCase(),
-        descricao: telefone,
-        mensagens: []
-    };
-
-
-    conversas.push(nova);
-    conversaAtual = nova.id;
-
-
-    salvarDados();
-    renderizarListaConversas();
-    renderizarChat();
-    abrirPagina("chat");
-}
-
 
 // CRIAR NOVO GRUPO
 
@@ -1359,7 +1329,6 @@ document.getElementById("verInfo").addEventListener("click", () => {
 
 function atualizarTudo() {
     salvarDados();
-    renderizarPerfil();
     renderizarListaConversas();
     renderizarChat();
     renderizarTarefas();
@@ -1376,83 +1345,3 @@ function atualizarTudo() {
 
 atualizarTudo();
 abrirPagina("chat");
-
-class ConnectAI {
-  constructor() {
-    this.lembretes = JSON.parse(localStorage.getItem('connect_lembretes') || '[]');
-    this.palavrasGatilho = ['festa', 'passeio', 'encontro', 'jogo', 'churrasco', 'prova', 'viagem', 'aniversário', 'reunião'];
-  }
-
-  async analisarMensagem(mensagem, autor, grupo) {
-    const texto = mensagem.toLowerCase();
-    const temGatilho = this.palavrasGatilho.some(p => texto.includes(p));
-    if (!temGatilho) return null;
-
-    const prompt = `
-    Você é o assistente do Connect+. Analise esta mensagem: "${mensagem}"
-    Extraia JSON com: {tipo: "festa"|"passeio"|"encontro"|"outro", titulo, data, hora, local, pessoas}
-    Se não tiver data, estime "a definir". Responda SÓ o JSON.
-    `;
-
-    const resposta = await this.chamarIA(prompt);
-
-    this.sugerirAcaoNoChat(resposta, grupo);
-  }
-
-  async chamarIA(prompt) {
-
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=SUA_CHAVE', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
-    const data = await res.json();
-    return JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g,''));
-  }
-
-  sugerirAcaoNoChat(dados, grupo) {
-
-    const div = document.createElement('div');
-    div.className = 'ai-sugestao';
-    div.innerHTML = `
-      <div style="background:#7c3aed;color:white;padding:12px;border-radius:12px;margin:8px 0">
-        <b>🤖 Connect+ detectou: ${dados.titulo}</b><br>
-        📅 ${dados.data} às ${dados.hora} - 📍 ${dados.local}<br><br>
-        <button onclick="connectAI.criarLembrete('${JSON.stringify(dados).replace(/'/g,"")}')">Criar lembrete</button>
-        <button onclick="connectAI.criarEnquete('${dados.titulo}')">Criar enquete</button>
-      </div>
-    `;
-    document.getElementById('chat-mensagens').appendChild(div);
-  }
-
-  criarLembrete(dados) {
-    const dadosObj = typeof dados === 'string' ? JSON.parse(dados) : dados;
-    this.lembretes.push({...dadosObj, id: Date.now(), notificado: false});
-    localStorage.setItem('connect_lembretes', JSON.stringify(this.lembretes));
-    this.agendarNotificacao(dadosObj);
-    alert(`Lembrete criado para ${dadosObj.titulo}!`);
-  }
-
-  agendarNotificacao(dados) {
-
-    if (Notification.permission !== 'granted') Notification.requestPermission();
-
-    const dataEvento = new Date(`${dados.data} ${dados.hora}`);
-    const tempoAte = dataEvento - new Date() - 1000*60*60; // 1h antes
-
-    if (tempoAte > 0) {
-      setTimeout(() => {
-        new Notification(`Connect+ lembrete: ${dados.titulo}`, {
-          body: `Hoje às ${dados.hora} em ${dados.local}`,
-          icon: '/icon.png'
-        });
-      }, tempoAte);
-    }
-  }
-}
-
-const connectAI = new ConnectAI();
-
-function aoReceberMensagem(msg, autor, grupo) {
-  connectAI.analisarMensagem(msg, autor, grupo);
-}

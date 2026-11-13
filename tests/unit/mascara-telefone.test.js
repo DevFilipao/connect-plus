@@ -41,7 +41,7 @@ for (const [entrada, esperado] of CASOS) {
     });
 }
 
-test("cada chamada adiciona um novo ouvinte 'input' (base do D9 em chat.js:227)", () => {
+test("cada chamada adiciona um novo ouvinte 'input' (base do D9: chat.js reaplicava a máscara a cada submit até a F2)", () => {
     const campo = campoFalso();
     aplicarMascaraTelefone(campo);
     aplicarMascaraTelefone(campo);
