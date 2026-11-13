@@ -1233,6 +1233,8 @@ dialog::backdrop {
 
 
     .conversation {
+        height: calc(100vh - 144px);
+        height: calc(100dvh - 144px);
         min-height: 650px;
     }
 

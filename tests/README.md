@@ -22,7 +22,7 @@ Nenhum teste chama o Apps Script de verdade. A API é sempre simulada por [apoio
 |---|---|---|
 | `unit/` | funções isoladas: sessão, contrato da API, máscara, `repositorio.js` (com storage falso) e todos os módulos de `js/dominio/` (via `require`) | `node:test` |
 | `integracao/` | as páginas **reais** (`app.html`, `login.html`, `index.html`, `termos.html`) com os scripts na ordem real | `node:test` + jsdom |
-| `e2e/` | login, sessão por aba ou aparelho, conversa, tarefa persistida e o visual da mensagem de erro do login (cores computadas no Chromium) | Playwright |
+| `e2e/` | login, sessão por aba ou aparelho, conversa, tarefa persistida o visual da mensagem de erro do login (cores computadas no Chromium) e a altura da conversa em quatro larguras de janela | Playwright |
 | `apoio/` | carregador do jsdom, dublê da API, carregador de script via `node:vm`, cobertura da UI | — |
 
 `carregarPagina` fecha sozinho as páginas que um teste esquecer aberta; sem isso, o polling do `chat.js` deixaria o processo travado depois de uma falha.
