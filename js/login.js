@@ -33,8 +33,8 @@ function mudarModo(modo) {
     
     const ehLogin = modo === "login";
 
-    formularioLogin.style.display = ehLogin ? "block" : "none";
-    formulario.style.display = ehLogin ? "none" : "block";
+    formLogin.style.display = ehLogin ? "block" : "none";
+    formCadastro.style.display = ehLogin ? "none" : "block";
 
     abaLogin.classList.toggle("ativa", ehLogin);
     abaCadastro.classList.toggle("ativa", !ehLogin);
@@ -156,3 +156,93 @@ document.querySelectorAll(".termos a").forEach(function (link) {
     link.addEventListener("click", salvarRascunho);
 });
 
+function ligarFormulario(form, aoEnviar) {
+    const erro = form.querySelector(".erro");
+    const botao = form.querySelector('button[type="submit"]');
+
+    form.addEventListener("submit", async function (ev) {
+        ev.preventDefault();
+        if (erro) erro.textContent = "";
+        botao.disabled = true;
+        try {
+            await aoEnviar();
+        } catch (e) {
+            if (erro) erro.textContent = e.message;
+            else alert(e.message);
+        } finally {
+            botao.disabled = false;
+        }
+    });
+}
+
+function mostrarMensagem(texto, comErro) {
+    mensagem.classList.toggle("mensagem-erro", comErro);
+    mensagem.style.display = "block";
+    mensagem.textContent = texto;
+}
+
+function valorDe(id) {
+    return document.getElementById(id).value;
+}
+
+function somenteDigitos(texto) {
+    return texto.replace(/\D/g, "");
+}
+
+function finalizarLogin() {
+    localStorage.removeItem("connect_usuario");
+    localStorage.removeItem("connect_lembrar");
+
+    sessionStorage.removeItem("rascunhoCadastro");
+    sessionStorage.removeItem("termosAceitos");
+
+    mensagem.textContent = "Login realizado com sucesso!";
+
+    location.replace("app.html");
+}
+
+function ligarLogin() {
+    ligarFormulario(formLogin, async function () {
+        const telefone = somenteDigitos(valorDe("loginNumero"));
+        const senha = valorDe("loginSenha");
+
+        const erros = validarLogin({
+            telefone,
+            senha,
+            aceitouTermos: campoTermosLogin.checked,
+            confirmouTitular: document.getElementById("termosDados").checked
+        });
+        if (erros.length) throw new Error(erros[0]);
+
+        try {
+            mostrarMensagem("Verificando sua conta...", false);
+            await entrar(telefone, senha, document.getElementById("lembrarLogin").checked);
+            finalizarLogin();
+        } catch (erro) {
+            mostrarMensagem(erro.message || "Erro ao entrar.", true);
+        }
+    });
+}
+
+function ligarCadastro() {
+    ligarFormulario(formCadastro, async function () {
+        const nome = valorDe("nome");
+        const telefone = somenteDigitos(valorDe("telefone"));
+        const senha = valorDe("senha");
+
+        const erros = validarCadastro({ nome, senha, confirmarSenha: valorDe("confirmarSenha") });
+        if (erros.length) throw new Error(erros[0]);
+
+        await cadastrar({ nome, telefone, email: valorDe("email"), senha });
+        await entrar(telefone, senha, true);
+        finalizarLogin();
+    });
+}
+
+const sessaoAtual = Sessao.ler();
+if (sessaoAtual && sessaoAtual.token) {
+    location.replace("app.html");
+} else {
+    ligarLogin();
+    ligarCadastro();
+}

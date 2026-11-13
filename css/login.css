@@ -411,6 +411,12 @@ body::after {
     font-weight: 600;
 }
 
+.mensagem.mensagem-erro {
+    background: #ff00001f;
+    border: 1px solid #ff000059;
+    color: red;
+}
+
 /* Responsivo */
 @media (max-width: 500px) {
 

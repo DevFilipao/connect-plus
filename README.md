@@ -93,18 +93,19 @@ connect-plus/
     │   ├── formato.js      funções puras: escaparHTML, formatarData, dataISO, horaPtBR, formatarTelefone
     │   ├── compromisso.js  extrai tipo, data, horário e local de uma frase
     │   ├── assistente.js   classifica a mensagem: enquete, evento, tarefa ou nada
-    │   └── votacao.js      regras de voto do quadro e das enquetes
+    │   ├── votacao.js      regras de voto do quadro e das enquetes
+    │   └── validacao.js    validação dos formulários de login e cadastro
     ├── storage.js  sessão no navegador
     ├── repositorio.js  leitura e gravação dos dados do app (tarefas, eventos, enquetes, grupos)
     ├── api.js      chamadas ao Apps Script
-    ├── auth.js     login, cadastro e saída
+    ├── auth.js     entrar, cadastrar, sair e exigir login (sem DOM)
     ├── chat.js     conversas ligadas à API
     ├── app.js      base da tela do app: elementos, estado, navegação e resumo de atividades
     ├── conversas.js, quadro.js, sugestao.js    chat local, quadro do compromisso e sugestões do assistente
     ├── tarefas.js, eventos.js, enquetes.js, memoria.js    uma tela por arquivo
     ├── modal.js    janelas de criação e seus formulários
     ├── inicio.js   primeira renderização (carrega por último entre os scripts do app)
-    ├── login.js    interface da tela de login
+    ├── login.js    tela de login e cadastro: abas, formulários e mensagens
     ├── termos.js   interface dos termos
     └── util.js     liga a máscara de telefone a um campo
 ```

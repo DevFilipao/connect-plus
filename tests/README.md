@@ -22,7 +22,7 @@ Nenhum teste chama o Apps Script de verdade. A API é sempre simulada por [apoio
 |---|---|---|
 | `unit/` | funções isoladas: sessão, contrato da API, máscara, `repositorio.js` (com storage falso) e todos os módulos de `js/dominio/` (via `require`) | `node:test` |
 | `integracao/` | as páginas **reais** (`app.html`, `login.html`, `index.html`, `termos.html`) com os scripts na ordem real | `node:test` + jsdom |
-| `e2e/` | login, sessão por aba ou aparelho, conversa, tarefa persistida | Playwright |
+| `e2e/` | login, sessão por aba ou aparelho, conversa, tarefa persistida e o visual da mensagem de erro do login (cores computadas no Chromium) | Playwright |
 | `apoio/` | carregador do jsdom, dublê da API, carregador de script via `node:vm`, cobertura da UI | — |
 
 `carregarPagina` fecha sozinho as páginas que um teste esquecer aberta; sem isso, o polling do `chat.js` deixaria o processo travado depois de uma falha.
@@ -69,3 +69,4 @@ O `test:cov:ui` é conservador: uma linha só conta se estiver inteira executada
 | F6 (app.js dividido) | 87,2% (igual: só movimentação) |
 
 Depois da F6, a cobertura por arquivo mostra onde está o que falta: `conversas.js` 28% (chat local antigo, inalcançável pela interface, D4) e `modal.js` 72% (ramos de grupos, que dependem do bloco comentado de `app.js`). Os demais módulos de funcionalidade estão entre 91% e 100%.
+| F7 (auth/login desacoplados) | 87,1% (`auth.js` 95,8%, `login.js` 93,8%) |

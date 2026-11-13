@@ -55,8 +55,26 @@ describe("app.html: ordem dos scripts", () => {
 });
 
 describe("login.html: ordem dos scripts", () => {
+    const scripts = scriptsDe("login.html");
+
+    test("todo script referenciado existe", () => {
+        for (const src of scripts) assert.ok(fs.existsSync(path.join(RAIZ, src)), src);
+    });
+
     test("formato.js vem antes de util.js, que usa formatarTelefone", () => {
-        assert.ok(antes(scriptsDe("login.html"), "js/dominio/formato.js", "js/util.js"));
+        assert.ok(antes(scripts, "js/dominio/formato.js", "js/util.js"));
+    });
+
+    test("login.js vem por último, depois de tudo o que ele usa", () => {
+        for (const base of ["js/dominio/formato.js", "js/dominio/validacao.js", "js/util.js",
+            "js/storage.js", "js/api.js", "js/auth.js"]) {
+            assert.ok(antes(scripts, base, "js/login.js"), `${base} deve vir antes de js/login.js`);
+        }
+    });
+
+    test("storage.js e api.js vêm antes de auth.js", () => {
+        assert.ok(antes(scripts, "js/storage.js", "js/auth.js"));
+        assert.ok(antes(scripts, "js/api.js", "js/auth.js"));
     });
 });
 

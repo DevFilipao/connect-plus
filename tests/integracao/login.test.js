@@ -42,6 +42,48 @@ describe("login: validações", () => {
     }
 });
 
+describe("login: vários problemas ao mesmo tempo", () => {
+    test("tudo errado → um único alert, o do primeiro problema (telefone)", async () => {
+        const p = await abrirLogin();
+        try {
+            preencherLogin(p, { numero: "", senha: "", termos: false, dados: false });
+            p.submeter("#formularioLogin");
+            await assentar();
+            assert.deepEqual(p.alertas, ["Informe o número de telefone."]);
+        } finally { p.fechar(); }
+    });
+
+    test("número curto e senha vazia → mostra o da senha vazia", async () => {
+        const p = await abrirLogin();
+        try {
+            preencherLogin(p, { numero: "(11) 9876", senha: "" });
+            p.submeter("#formularioLogin");
+            await assentar();
+            assert.deepEqual(p.alertas, ["Informe a senha."]);
+        } finally { p.fechar(); }
+    });
+
+    test("número curto e senha curta → mostra o do número", async () => {
+        const p = await abrirLogin();
+        try {
+            preencherLogin(p, { numero: "(11) 9876", senha: "123" });
+            p.submeter("#formularioLogin");
+            await assentar();
+            assert.deepEqual(p.alertas, ["Digite um número válido com DDD!"]);
+        } finally { p.fechar(); }
+    });
+
+    test("só os termos faltando (telefone e senha válidos) → mostra o dos termos, não o do titular", async () => {
+        const p = await abrirLogin();
+        try {
+            preencherLogin(p, { termos: false, dados: false });
+            p.submeter("#formularioLogin");
+            await assentar();
+            assert.deepEqual(p.alertas, ["Para continuar, aceite os Termos de Uso e a Política de Privacidade."]);
+        } finally { p.fechar(); }
+    });
+});
+
 describe("login: envio", () => {
     test("sucesso sem 'lembrar' → sessão em sessionStorage, limpa chaves legadas e vai para app.html", async () => {
         const p = await abrirLogin({
@@ -80,7 +122,7 @@ describe("login: envio", () => {
         } finally { p.fechar(); }
     });
 
-    test("erro da API → mensagem vermelha em #mensagem, sem alert e sem navegar", async () => {
+    test("erro da API → mensagem de erro em #mensagem (classe mensagem-erro), sem alert e sem navegar", async () => {
         const p = await abrirLogin();
         try {
             preencherLogin(p, { senha: "errada1" });
@@ -88,11 +130,54 @@ describe("login: envio", () => {
             await assentar();
             const mensagem = p.$("#mensagem");
             assert.equal(mensagem.textContent, "Número ou senha incorretos.");
-            assert.equal(mensagem.style.color, "red");
+            assert.ok(mensagem.classList.contains("mensagem-erro"));
+            assert.equal(mensagem.style.color, "");
+            assert.equal(mensagem.style.backgroundColor, "");
+            assert.equal(mensagem.style.border, "");
             assert.equal(mensagem.style.display, "block");
             assert.deepEqual(p.alertas, []);
             assert.deepEqual(p.navegacoes, []);
             assert.equal(p.$("#btnLogin").disabled, false);
+        } finally { p.fechar(); }
+    });
+
+    test("a classe de erro só vale para o erro: some enquanto verifica e volta se falhar de novo", async () => {
+        const p = await abrirLogin();
+        try {
+            let liberar;
+            const segurar = new Promise(resolve => { liberar = resolve; });
+            const fetchOriginal = p.window.fetch;
+            p.window.fetch = async (...args) => { await segurar; return fetchOriginal(...args); };
+
+            preencherLogin(p, { senha: "errada1" });
+            p.submeter("#formularioLogin");
+            await assentar();
+            const mensagem = p.$("#mensagem");
+            assert.equal(mensagem.textContent, "Verificando sua conta...");
+            assert.equal(mensagem.classList.contains("mensagem-erro"), false);
+            assert.equal(mensagem.style.display, "block");
+
+            liberar();
+            await assentar();
+            assert.equal(mensagem.classList.contains("mensagem-erro"), true);
+
+            p.window.fetch = async (...args) => { await new Promise(() => {}); return fetchOriginal(...args); };
+            p.submeter("#formularioLogin");
+            await assentar();
+            assert.equal(mensagem.textContent, "Verificando sua conta...");
+            assert.equal(mensagem.classList.contains("mensagem-erro"), false);
+        } finally { p.fechar(); }
+    });
+
+    test("resposta de erro sem texto mostra o padrão do cliente ('Erro na API.')", async () => {
+        const api = criarApiFalsa({ login: () => ({ ok: false }) });
+        const p = await abrirLogin({ api });
+        try {
+            preencherLogin(p);
+            p.submeter("#formularioLogin");
+            await assentar();
+            assert.equal(p.$("#mensagem").textContent, "Erro na API.");
+            assert.ok(p.$("#mensagem").classList.contains("mensagem-erro"));
         } finally { p.fechar(); }
     });
 
@@ -131,6 +216,17 @@ describe("cadastro", () => {
             } finally { p.fechar(); }
         });
     }
+
+    test("nome vazio e senhas diferentes → mostra só o do nome", async () => {
+        const p = await abrirLogin();
+        try {
+            preencherCadastro(p, { nome: "", senha: "a", confirmar: "b" });
+            p.submeter("#formulario");
+            await assentar();
+            assert.equal(p.$("#erro").textContent, "Informe o nome.");
+            assert.equal(p.api.doTipo("cadastro").length, 0);
+        } finally { p.fechar(); }
+    });
 
     test("sucesso → cadastro + login, sessão lembrada (localStorage) e vai para app.html", async () => {
         const p = await abrirLogin();
