@@ -66,3 +66,6 @@ O `test:cov:ui` é conservador: uma linha só conta se estiver inteira executada
 | F3 (formato.js extraído) | 87,8% (`js/dominio/formato.js` fora da conta: 100% em `test:cov`) |
 | F4 (assistente e votação extraídos) | 86,9% (`js/dominio/*` fora da conta: ≥ 96% em `test:cov`) |
 | F5 (repositorio.js extraído) | 87,2% (inclui `repositorio.js`; 100% em `test:cov`) |
+| F6 (app.js dividido) | 87,2% (igual: só movimentação) |
+
+Depois da F6, a cobertura por arquivo mostra onde está o que falta: `conversas.js` 28% (chat local antigo, inalcançável pela interface, D4) e `modal.js` 72% (ramos de grupos, que dependem do bloco comentado de `app.js`). Os demais módulos de funcionalidade estão entre 91% e 100%.

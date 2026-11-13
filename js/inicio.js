@@ -1,0 +1,2 @@
+atualizarTudo();
+abrirPagina("chat");

@@ -99,7 +99,11 @@ connect-plus/
     ├── api.js      chamadas ao Apps Script
     ├── auth.js     login, cadastro e saída
     ├── chat.js     conversas ligadas à API
-    ├── app.js      interface do app (usa os módulos de dominio/)
+    ├── app.js      base da tela do app: elementos, estado, navegação e resumo de atividades
+    ├── conversas.js, quadro.js, sugestao.js    chat local, quadro do compromisso e sugestões do assistente
+    ├── tarefas.js, eventos.js, enquetes.js, memoria.js    uma tela por arquivo
+    ├── modal.js    janelas de criação e seus formulários
+    ├── inicio.js   primeira renderização (carrega por último entre os scripts do app)
     ├── login.js    interface da tela de login
     ├── termos.js   interface dos termos
     └── util.js     liga a máscara de telefone a um campo
