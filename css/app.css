@@ -450,6 +450,27 @@ button {
     gap: 17px;
     padding: 22px;
     background: #091524;
+    scrollbar-width: thin;
+    scrollbar-color: var(--faint) transparent;
+}
+
+@supports not (scrollbar-color: auto) {
+    .messages::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+        background: var(--faint);
+        border-radius: 8px;
+    }
+
+    .messages::-webkit-scrollbar-thumb:hover {
+        background: var(--muted);
+    }
 }
 
 
