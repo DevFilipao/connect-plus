@@ -62,14 +62,41 @@ Desenvolver um **protótipo funcional** de aplicativo de mensagens capaz de ente
  
 ## ▶️ Como executar
  
-> Seção a ser preenchida conforme o protótipo for desenvolvido.
- 
+O projeto é um site estático (sem instalação nem build). Basta servir a pasta:
+
 ```bash
 # clone o repositório
 git clone <url-do-repositorio>
- 
+
 # entre na pasta do projeto
 cd connect-plus
+
+# sirva os arquivos (mesma porta do .vscode/launch.json)
+python3 -m http.server 8080
+```
+
+Depois abra <http://localhost:8080>. A página inicial leva ao login ou, se já houver sessão, ao app.
+
+O back-end é um Web App do Google Apps Script. A URL dele fica em `API_URL`, no arquivo `js/api.js`.
+
+### Estrutura
+
+```text
+connect-plus/
+├── index.html      entrada: redireciona para login ou app
+├── login.html      entrar / criar conta
+├── app.html        app principal (conversas, tarefas, eventos, enquetes, memória)
+├── termos.html     termos de uso e política de privacidade
+├── css/            um estilo por página (login, app, termos)
+└── js/
+    ├── storage.js  sessão no navegador
+    ├── api.js      chamadas ao Apps Script
+    ├── auth.js     login, cadastro e saída
+    ├── chat.js     conversas ligadas à API
+    ├── app.js      interface do app e assistente simulado
+    ├── login.js    interface da tela de login
+    ├── termos.js   interface dos termos
+    └── util.js     máscara de telefone
 ```
  
 ## 👥 Equipe

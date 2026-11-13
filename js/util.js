@@ -20,27 +20,3 @@ function aplicarMascaraTelefone(campo) {
         }
     });
 }
-
-function abrirPagina(pagina) {
-    document.querySelectorAll(".view").forEach(view => {
-        view.classList.remove("active");
-    });
-
-
-    document.getElementById(`view-${pagina}`).classList.add("active");
-
-
-    document.querySelectorAll(".menu-item").forEach(botao => {
-        botao.classList.toggle("active", botao.dataset.view === pagina);
-    });
-
-
-    document.getElementById("tituloPagina").textContent = titulos[pagina][0];
-    document.getElementById("subtituloPagina").textContent = titulos[pagina][1];
-
-
-    if (pagina === "tarefas") renderizarTarefas();
-    if (pagina === "eventos") renderizarEventos();
-    if (pagina === "enquetes") renderizarEnquetes();
-    if (pagina === "memoria") renderizarMemoria();
-}

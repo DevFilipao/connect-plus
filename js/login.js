@@ -1,5 +1,3 @@
-// const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyZUaQxHXB7PHBjK5lwf8LhJogyWpLzBzrCZ7hVG5DifpzlPZ8V8QRGtGsRpuSkiKGd/exec";
-
 /* ============================================================
    UTILIDADES
    ============================================================ */

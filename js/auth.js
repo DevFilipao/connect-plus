@@ -17,23 +17,25 @@ async function sair() {
   location.replace('login.html');
 }
 
-async function entrar(telefone, senha) {
+async function entrar(telefone, senha, lembrar) {
   var dados = await chamarApi('login', { telefone: telefone, senha: senha });
-  Sessao.salvar(dados);
+  Sessao.salvar(dados, lembrar);
   return dados;
 }
 
 function ligarFormulario(form, aoEnviar) {
-  var erro = document.getElementById('erro');
+  var erro = form.querySelector('.erro'); // só o cadastro tem; no login o erro vai para alert
   var botao = form.querySelector('button[type="submit"]');
   form.addEventListener('submit', async function (ev) {
     ev.preventDefault();
-    erro.textContent = '';
+    if (erro) erro.textContent = '';
     botao.disabled = true;
     try {
-      aoEnviar();
+      await aoEnviar();
     } catch (e) {
-      erro.textContent = e.message;
+      if (erro) erro.textContent = e.message;
+      else alert(e.message);
+    } finally {
       botao.disabled = false;
     }
   });
@@ -93,9 +95,9 @@ function ligarFormulario(form, aoEnviar) {
         mensagem.style.display = "block";
         mensagem.textContent = "Verificando sua conta...";
 
-        const resultado = await entrar(numeroLimpo, senha);
-       
-        manterDadosLocal(resultado, lembrar);
+        await entrar(numeroLimpo, senha, lembrar);
+
+        finalizarLogin();
 
       } catch (erro) {
 
@@ -135,63 +137,24 @@ function ligarFormulario(form, aoEnviar) {
         senha: senha
       });
 
-      const resultado = await entrar(numeroLimpo, senha);
-      
-      manterDadosLocal(resultado, true);
+      await entrar(numeroLimpo, senha, true);
+
+      finalizarLogin();
     });
   }
 })();
 
 
-function manterDadosLocal(resultado, lembrar) {
-        // Mantém o número se já estiver guardado neste aparelho
-        let numeroSalvo = "";
-        let anterior = null;
-        
-        try {
-            anterior = JSON.parse(localStorage.getItem("connect_usuario"));
-            if (anterior?.telefone) {
-              console.log("Número salvo anteriormente:", anterior.telefone);
-              numeroSalvo = anterior.telefone;
-            }
-        } catch (e) {
-            alert("Não foi possível ler o número salvo no aparelho."+
-                e
-            );
-        }
+// A sessão já foi salva por entrar(); aqui só limpa rascunhos e segue para o app.
+function finalizarLogin() {
+  // Chaves de versões antigas (a sessão agora fica só em 'sessao')
+  localStorage.removeItem("connect_usuario");
+  localStorage.removeItem("connect_lembrar");
 
-        const dadosUsuario = {
-            id: resultado.id,
-            nome: resultado.nome || "",
-            telefone: resultado.telefone || numeroSalvo,
-            email: resultado.email
-        };
-        
-        executarComPausa(anterior);
+  sessionStorage.removeItem("rascunhoCadastro");
+  sessionStorage.removeItem("termosAceitos");
 
-        localStorage.setItem("connect_usuario", JSON.stringify(dadosUsuario));
+  mensagem.textContent = "Login realizado com sucesso!";
 
-        try {
-            if (lembrar) {
-                localStorage.setItem("connect_lembrar", "sim");
-            } else {
-                localStorage.removeItem("connect_lembrar");
-            }
-        } catch (e) {
-            alert("Não foi possível salvar a preferência de 'lembrar login'.\n" + e);
-        }
-
-        sessionStorage.removeItem("rascunhoCadastro");
-        sessionStorage.removeItem("termosAceitos");
-
-        mensagem.textContent = "Login realizado com sucesso!";
-
-       location.replace('app.html');
-}
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function executarComPausa(dados) {
-  console.log(dados);
-  await sleep(10000);
+  location.replace('app.html');
 }

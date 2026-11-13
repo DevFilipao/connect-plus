@@ -21,8 +21,8 @@ function carregarDados(chave, padrao) {
     }
 }
 
-// Usuário criado na página de cadastro (login.html)
-const usuario = carregarDados("connect_usuario", null);
+// Usuário logado (sessão salva em js/storage.js)
+const usuario = Sessao.ler();
 const nomeUsuario = (usuario && usuario.nome ? usuario.nome.trim().split(" ")[0] : "") || "Maria";
 
 
@@ -152,7 +152,29 @@ const titulos = {
 };
 
 
+function abrirPagina(pagina) {
+    document.querySelectorAll(".view").forEach(view => {
+        view.classList.remove("active");
+    });
 
+
+    document.getElementById(`view-${pagina}`).classList.add("active");
+
+
+    document.querySelectorAll(".menu-item").forEach(botao => {
+        botao.classList.toggle("active", botao.dataset.view === pagina);
+    });
+
+
+    document.getElementById("tituloPagina").textContent = titulos[pagina][0];
+    document.getElementById("subtituloPagina").textContent = titulos[pagina][1];
+
+
+    if (pagina === "tarefas") renderizarTarefas();
+    if (pagina === "eventos") renderizarEventos();
+    if (pagina === "enquetes") renderizarEnquetes();
+    if (pagina === "memoria") renderizarMemoria();
+}
 
 
 document.querySelectorAll(".menu-item").forEach(botao => {
@@ -202,15 +224,6 @@ function renderizarListaConversas() {
             abrirPagina("chat");
         });
     });
-}
-
-
-function selecionarConversa(id) {
-    conversaAtual = id;
-    sugestaoAtual = null;
-    sugestao.hidden = true;
-    renderizarChat();
-    renderizarListaConversas();
 }
 
 
@@ -270,12 +283,6 @@ async function enviarMensagem(texto) {
     salvarDados();
     renderizarChat();
     renderizarListaConversas();
-
-
-    // Envia para a planilha
-    if (conversa.contatoReal) {
-        await enviarMensagemParaPlanilha(textoLimpo, conversa);
-    }
 
 
     analisarMensagem(textoLimpo);
