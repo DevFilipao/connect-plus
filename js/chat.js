@@ -163,9 +163,7 @@ function renderizarMensagem(msg) {
 
   var hora = document.createElement('span');
   hora.className = 'message-time';
-  hora.textContent = new Date(msg.dataHora).toLocaleTimeString('pt-BR', {
-    hour: '2-digit', minute: '2-digit'
-  });
+  hora.textContent = horaPtBR(new Date(msg.dataHora));
 
   conteudo.append(bolha, hora);
   linha.append(conteudo);

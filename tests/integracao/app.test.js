@@ -253,3 +253,25 @@ describe("modal e cabeçalho", () => {
         } finally { p.fechar(); }
     });
 });
+
+describe("utilitários de app.js", () => {
+    test("gerarId devolve número baseado em Date.now()", async () => {
+        const p = await carregarApp();
+        try {
+            const id = p.window.gerarId();
+            assert.equal(typeof id, "number");
+            assert.ok(id >= p.window.Date.now() - 5 && id <= p.window.Date.now() + 1000);
+        } finally { p.fechar(); }
+    });
+
+    test("as funções de formato chegam à página como globais (ordem dos scripts em app.html)", async () => {
+        const p = await carregarApp();
+        try {
+            for (const nome of ["escaparHTML", "formatarData", "dataISO", "horaPtBR", "formatarTelefone"]) {
+                assert.equal(typeof p.window[nome], "function", nome);
+            }
+            assert.equal(p.window.horaPtBR(), "10:00"); // relógio fixo da página
+            assert.equal(p.window.dataISO(), "2026-11-11");
+        } finally { p.fechar(); }
+    });
+});

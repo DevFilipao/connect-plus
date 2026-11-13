@@ -89,6 +89,8 @@ connect-plus/
 ├── termos.html     termos de uso e política de privacidade
 ├── css/            um estilo por página (login, app, termos)
 └── js/
+    ├── dominio/
+    │   └── formato.js  funções puras: escaparHTML, formatarData, dataISO, horaPtBR, formatarTelefone
     ├── storage.js  sessão no navegador
     ├── api.js      chamadas ao Apps Script
     ├── auth.js     login, cadastro e saída
@@ -96,7 +98,7 @@ connect-plus/
     ├── app.js      interface do app e assistente simulado
     ├── login.js    interface da tela de login
     ├── termos.js   interface dos termos
-    └── util.js     máscara de telefone
+    └── util.js     liga a máscara de telefone a um campo
 ```
  
 ## 👥 Equipe

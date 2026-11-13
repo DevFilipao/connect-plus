@@ -71,35 +71,6 @@ function salvarDados() {
 }
 
 
-function escaparHTML(texto) {
-    return String(texto).replace(/[&<>"']/g, caractere => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-    })[caractere]);
-}
-
-
-function horarioAtual() {
-    return new Date().toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-}
-
-
-function dataAtual() {
-    const agora = new Date();
-    return [
-        agora.getFullYear(),
-        String(agora.getMonth() + 1).padStart(2, "0"),
-        String(agora.getDate()).padStart(2, "0")
-    ].join("-");
-}
-
-
 function gerarId() {
     return Date.now() + Math.floor(Math.random() * 1000);
 }
@@ -107,18 +78,6 @@ function gerarId() {
 
 function obterConversa() {
     return conversas.find(c => c.id === conversaAtual);
-}
-
-
-function formatarData(data) {
-    if (!data) return "Sem data definida";
-
-
-    const partes = data.split("-");
-    if (partes.length !== 3) return data;
-
-
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
 
@@ -264,7 +223,7 @@ async function enviarMensagem(texto) {
     const mensagem = {
         autor: nomeUsuario,
         texto: textoLimpo,
-        hora: horarioAtual(),
+        hora: horaPtBR(),
         minha: true
     };
 
@@ -468,15 +427,6 @@ const TIPOS_COMPROMISSO = [
 ];
 
 
-function dataParaTexto(data) {
-    return [
-        data.getFullYear(),
-        String(data.getMonth() + 1).padStart(2, "0"),
-        String(data.getDate()).padStart(2, "0")
-    ].join("-");
-}
-
-
 // Lê a frase e tenta descobrir tipo, dia, horário e local
 function extrairCompromisso(texto) {
     const minusculo = texto.toLowerCase();
@@ -499,10 +449,10 @@ function extrairCompromisso(texto) {
     } else if (/\bamanh[ãa]\b/.test(minusculo)) {
         const d = new Date(hoje);
         d.setDate(d.getDate() + 1);
-        data = dataParaTexto(d);
+        data = dataISO(d);
         diaNome = "Amanhã";
     } else if (/\bhoje\b/.test(minusculo)) {
-        data = dataParaTexto(hoje);
+        data = dataISO(hoje);
         diaNome = "Hoje";
     } else {
         const dia = DIAS_SEMANA.find(item => item.chaves.some(c => minusculo.includes(c)));
@@ -510,7 +460,7 @@ function extrairCompromisso(texto) {
             const d = new Date(hoje);
             const falta = (dia.indice - d.getDay() + 7) % 7 || 7;
             d.setDate(d.getDate() + falta);
-            data = dataParaTexto(d);
+            data = dataISO(d);
             diaNome = dia.nome;
         }
     }
@@ -555,7 +505,7 @@ function publicarQuadro(compromisso, { conversaId, salvo = false } = {}) {
             tipo: "quadro",
             autor: "Connect+ IA",
             texto: `📋 ${quadro.titulo}`,
-            hora: horarioAtual(),
+            hora: horaPtBR(),
             minha: false,
             quadro
         });
@@ -715,7 +665,7 @@ function analisarMensagem(texto) {
                 id: gerarId(),
                 texto,
                 conversa: obterConversa()?.nome || "Conversa",
-                data: dataAtual()
+                data: dataISO()
             });
 
 

@@ -10,8 +10,8 @@ npx playwright install chromium  # uma vez, para os testes E2E
 
 npm test             # unitários + integração (node:test + jsdom), ~7 s
 npm run test:e2e     # ponta a ponta no Chromium (Playwright), ~4 s
-npm run test:cov     # cobertura de storage.js, api.js e util.js (rodados via node:vm)
-npm run test:cov:ui  # cobertura aproximada dos scripts rodados dentro do jsdom
+npm run test:cov     # cobertura de js/dominio/*, storage.js, api.js e util.js (rodados via require ou node:vm)
+npm run test:cov:ui  # cobertura aproximada dos scripts rodados dentro do jsdom (sem js/dominio/*)
 ```
 
 Nenhum teste chama o Apps Script de verdade. A API é sempre simulada por [apoio/api-falsa.js](apoio/api-falsa.js).
@@ -20,7 +20,7 @@ Nenhum teste chama o Apps Script de verdade. A API é sempre simulada por [apoio
 
 | Pasta | O que tem | Ferramenta |
 |---|---|---|
-| `unit/` | funções isoladas: sessão, contrato da API, máscara, formatação, `extrairCompromisso` | `node:test` |
+| `unit/` | funções isoladas: sessão, contrato da API, máscara, `js/dominio/formato.js` (via `require`), `extrairCompromisso` | `node:test` |
 | `integracao/` | as páginas **reais** (`app.html`, `login.html`, `index.html`, `termos.html`) com os scripts na ordem real | `node:test` + jsdom |
 | `e2e/` | login, sessão por aba ou aparelho, conversa, tarefa persistida | Playwright |
 | `apoio/` | carregador do jsdom, dublê da API, carregador de script via `node:vm`, cobertura da UI | — |
@@ -61,3 +61,4 @@ O `test:cov:ui` é conservador: uma linha só conta se estiver inteira executada
 | Depois da fase | UI (todos via jsdom) |
 |---|---|
 | F2 (código morto removido) | 89,1% |
+| F3 (formato.js extraído) | 87,8% (`js/dominio/formato.js` fora da conta: 100% em `test:cov`) |

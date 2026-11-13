@@ -33,6 +33,8 @@ for (const arquivo of fs.readdirSync(SAIDA)) {
     for (const script of result) {
         const m = script.url.match(/^http:\/\/localhost:8080\/(js\/[\w/-]+\.js)$/);
         if (!m) continue;
+        // js/dominio/* é puro e tem meta própria; é medido por `npm run test:cov` (require direto).
+        if (m[1].startsWith("js/dominio/")) continue;
         const fonte = fs.readFileSync(path.join(RAIZ, m[1]), "utf8");
         const contagem = new Int32Array(fonte.length);
         const faixas = script.functions.flatMap(f => f.ranges)
