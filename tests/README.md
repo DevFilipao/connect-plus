@@ -20,7 +20,7 @@ Nenhum teste chama o Apps Script de verdade. A API é sempre simulada por [apoio
 
 | Pasta | O que tem | Ferramenta |
 |---|---|---|
-| `unit/` | funções isoladas: sessão, contrato da API, máscara, `js/dominio/formato.js` (via `require`), `extrairCompromisso` | `node:test` |
+| `unit/` | funções isoladas: sessão, contrato da API, máscara e todos os módulos de `js/dominio/` (via `require`) | `node:test` |
 | `integracao/` | as páginas **reais** (`app.html`, `login.html`, `index.html`, `termos.html`) com os scripts na ordem real | `node:test` + jsdom |
 | `e2e/` | login, sessão por aba ou aparelho, conversa, tarefa persistida | Playwright |
 | `apoio/` | carregador do jsdom, dublê da API, carregador de script via `node:vm`, cobertura da UI | — |
@@ -62,3 +62,4 @@ O `test:cov:ui` é conservador: uma linha só conta se estiver inteira executada
 |---|---|
 | F2 (código morto removido) | 89,1% |
 | F3 (formato.js extraído) | 87,8% (`js/dominio/formato.js` fora da conta: 100% em `test:cov`) |
+| F4 (assistente e votação extraídos) | 86,9% (`js/dominio/*` fora da conta: ≥ 96% em `test:cov`) |

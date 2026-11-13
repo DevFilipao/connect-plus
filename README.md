@@ -90,12 +90,15 @@ connect-plus/
 ├── css/            um estilo por página (login, app, termos)
 └── js/
     ├── dominio/
-    │   └── formato.js  funções puras: escaparHTML, formatarData, dataISO, horaPtBR, formatarTelefone
+    │   ├── formato.js      funções puras: escaparHTML, formatarData, dataISO, horaPtBR, formatarTelefone
+    │   ├── compromisso.js  extrai tipo, data, horário e local de uma frase
+    │   ├── assistente.js   classifica a mensagem: enquete, evento, tarefa ou nada
+    │   └── votacao.js      regras de voto do quadro e das enquetes
     ├── storage.js  sessão no navegador
     ├── api.js      chamadas ao Apps Script
     ├── auth.js     login, cadastro e saída
     ├── chat.js     conversas ligadas à API
-    ├── app.js      interface do app e assistente simulado
+    ├── app.js      interface do app (usa os módulos de dominio/)
     ├── login.js    interface da tela de login
     ├── termos.js   interface dos termos
     └── util.js     liga a máscara de telefone a um campo

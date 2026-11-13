@@ -409,81 +409,6 @@ function prepararModalGrupo() {
 
 const OPCOES_QUADRO = ["Vou", "Talvez", "Não vou"];
 
-const DIAS_SEMANA = [
-    { chaves: ["domingo"], indice: 0, nome: "Domingo" },
-    { chaves: ["segunda"], indice: 1, nome: "Segunda-feira" },
-    { chaves: ["terça", "terca"], indice: 2, nome: "Terça-feira" },
-    { chaves: ["quarta"], indice: 3, nome: "Quarta-feira" },
-    { chaves: ["quinta"], indice: 4, nome: "Quinta-feira" },
-    { chaves: ["sexta"], indice: 5, nome: "Sexta-feira" },
-    { chaves: ["sábado", "sabado"], indice: 6, nome: "Sábado" }
-];
-
-const TIPOS_COMPROMISSO = [
-    ["jogo", "Jogo"], ["reunião", "Reunião"], ["reuniao", "Reunião"],
-    ["encontro", "Encontro"], ["aniversário", "Aniversário"],
-    ["aniversario", "Aniversário"], ["passeio", "Passeio"],
-    ["viagem", "Viagem"], ["festa", "Festa"]
-];
-
-
-// Lê a frase e tenta descobrir tipo, dia, horário e local
-function extrairCompromisso(texto) {
-    const minusculo = texto.toLowerCase();
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-
-    let titulo = "Compromisso";
-    const tipo = TIPOS_COMPROMISSO.find(([chave]) => minusculo.includes(chave));
-    if (tipo) titulo = tipo[1];
-
-    let data = "";
-    let diaNome = "";
-
-    const explicita = minusculo.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
-    if (explicita) {
-        const ano = explicita[3]
-            ? (explicita[3].length === 2 ? 2000 + Number(explicita[3]) : Number(explicita[3]))
-            : hoje.getFullYear();
-        data = `${ano}-${explicita[2].padStart(2, "0")}-${explicita[1].padStart(2, "0")}`;
-    } else if (/\bamanh[ãa]\b/.test(minusculo)) {
-        const d = new Date(hoje);
-        d.setDate(d.getDate() + 1);
-        data = dataISO(d);
-        diaNome = "Amanhã";
-    } else if (/\bhoje\b/.test(minusculo)) {
-        data = dataISO(hoje);
-        diaNome = "Hoje";
-    } else {
-        const dia = DIAS_SEMANA.find(item => item.chaves.some(c => minusculo.includes(c)));
-        if (dia) {
-            const d = new Date(hoje);
-            const falta = (dia.indice - d.getDay() + 7) % 7 || 7;
-            d.setDate(d.getDate() + falta);
-            data = dataISO(d);
-            diaNome = dia.nome;
-        }
-    }
-
-    let horario = "";
-    const hora = minusculo.match(/\b(\d{1,2})\s*(?:h|:)\s*(\d{2})?\b/) ||
-        minusculo.match(/\bàs\s+(\d{1,2})()\b/);
-    if (hora && Number(hora[1]) < 24) {
-        horario = `${hora[1].padStart(2, "0")}:${hora[2] || "00"}`;
-    }
-
-    let local = "";
-    const achouLocal = texto.match(
-        /\b(?:no|na|em|n[oa]s)\s+((?:[A-ZÀ-Ú][\wÀ-ú]*)(?:\s+(?:d[aeo]s?\s+)?[A-ZÀ-Ú][\wÀ-ú]*)*)/
-    );
-    if (achouLocal) local = achouLocal[1];
-
-    if (diaNome) titulo = `${titulo} · ${diaNome}`;
-
-    return { titulo, data, horario, local };
-}
-
-
 function publicarQuadro(compromisso, { conversaId, salvo = false } = {}) {
     const conversa = conversas.find(c => c.id === conversaId);
     if (!conversa) return;
@@ -494,7 +419,7 @@ function publicarQuadro(compromisso, { conversaId, salvo = false } = {}) {
         data: compromisso.data || "",
         horario: compromisso.horario || "",
         local: compromisso.local || "",
-        opcoes: OPCOES_QUADRO.map(texto => ({ texto, votos: 0 })),
+        opcoes: criarOpcoes(OPCOES_QUADRO),
         voto: null,
         salvo
     };
@@ -519,7 +444,7 @@ function publicarQuadro(compromisso, { conversaId, salvo = false } = {}) {
 
 function htmlQuadro(mensagem) {
     const q = mensagem.quadro;
-    const total = q.opcoes.reduce((soma, o) => soma + o.votos, 0);
+    const total = totalVotos(q.opcoes);
 
     return `
         <div class="message-row ai-row">
@@ -536,7 +461,7 @@ function htmlQuadro(mensagem) {
                     </ul>
                     <p class="ai-board-question">Quem vai?</p>
                     ${q.opcoes.map((opcao, indice) => {
-                        const pct = total ? Math.round(opcao.votos / total * 100) : 0;
+                        const pct = porcentagem(opcao.votos, total);
                         return `
                             <button type="button" class="ai-option ${q.voto === indice ? "voted" : ""}"
                                 data-quadro="${q.id}" data-opcao="${indice}">
@@ -573,15 +498,7 @@ mensagens.addEventListener("click", event => {
         const q = acharQuadro(Number(votar.dataset.quadro));
         if (!q) return;
 
-        const indice = Number(votar.dataset.opcao);
-        if (q.voto !== null) q.opcoes[q.voto].votos--;
-
-        if (q.voto === indice) {
-            q.voto = null; // clicar de novo remove o voto
-        } else {
-            q.opcoes[indice].votos++;
-            q.voto = indice;
-        }
+        alternarVoto(q, Number(votar.dataset.opcao)); // clicar de novo na mesma opção remove o voto
 
         salvarDados();
         renderizarChat();
@@ -602,51 +519,21 @@ mensagens.addEventListener("click", event => {
 
 
 function analisarMensagem(texto) {
-    const textoMinusculo = texto.toLowerCase();
+    const tipo = classificarMensagem(texto);
 
 
-    const palavrasTarefa = [
-        "preciso", "não esquecer", "nao esquecer",
-        "lembrar", "estudar", "trabalho", "entregar",
-        "fazer", "organizar", "levar", "comprar",
-        "prova", "atividade", "tarefa", "treinar"
-    ];
-
-
-    const palavrasEvento = [
-        "jogo", "reunião", "reuniao", "encontro",
-        "aniversário", "aniversario", "passeio",
-        "viagem", "festa", "sábado", "sabado",
-        "domingo", "segunda", "terça", "terca",
-        "quarta", "quinta", "sexta", "amanhã", "amanha"
-    ];
-
-
-    const palavrasEnquete = [
-        "qual horário", "qual horario", "qual dia",
-        "quem consegue", "quem vai", "vamos escolher",
-        "o que vocês preferem", "o que voces preferem",
-        "qual vocês preferem", "qual voces preferem"
-    ];
-
-
-    const temTarefa = palavrasTarefa.some(p => textoMinusculo.includes(p));
-    const temEvento = palavrasEvento.some(p => textoMinusculo.includes(p));
-    const temEnquete = palavrasEnquete.some(p => textoMinusculo.includes(p));
-
-
-    if (temEnquete) {
+    if (tipo === "enquete") {
         mostrarSugestao(
             "enquete",
             texto,
             "Parece que vocês estão tentando tomar uma decisão. Que tal criar uma enquete?"
         );
-    } else if (temEvento) {
+    } else if (tipo === "evento") {
         // A IA do Connect+ monta o quadro do compromisso direto no chat
         sugestao.hidden = true;
         sugestaoAtual = null;
         publicarQuadro(extrairCompromisso(texto), { conversaId: conversaAtual });
-    } else if (temTarefa) {
+    } else if (tipo === "tarefa") {
         mostrarSugestao(
             "tarefa",
             texto,
@@ -659,7 +546,7 @@ function analisarMensagem(texto) {
 
 
     // Guarda mensagens que parecem conter informações importantes.
-    if (temTarefa || temEvento || temEnquete) {
+    if (tipo) {
         if (!memoria.some(item => item.texto === texto)) {
             memoria.unshift({
                 id: gerarId(),
@@ -873,7 +760,7 @@ function adicionarEnquete(pergunta, opcoes) {
     enquetes.unshift({
         id: gerarId(),
         pergunta,
-        opcoes: opcoes.map(texto => ({ texto, votos: 0 })),
+        opcoes: criarOpcoes(opcoes),
         voto: null
     });
 
@@ -894,7 +781,7 @@ function renderizarEnquetes() {
 
 
     lista.innerHTML = enquetes.map(enquete => {
-        const total = enquete.opcoes.reduce((soma, opcao) => soma + opcao.votos, 0);
+        const total = totalVotos(enquete.opcoes);
 
 
         return `
@@ -903,7 +790,7 @@ function renderizarEnquetes() {
                 <h3>${escaparHTML(enquete.pergunta)}</h3>
                 <p>${total} voto(s)</p>
                 ${enquete.opcoes.map((opcao, indice) => {
-                    const porcentagem = total ? Math.round(opcao.votos / total * 100) : 0;
+                    const pct = porcentagem(opcao.votos, total);
 
 
                     return `
@@ -912,7 +799,7 @@ function renderizarEnquetes() {
                                 <span>${escaparHTML(opcao.texto)}</span>
                                 <strong>${opcao.votos} voto(s)</strong>
                             </div>
-                            <div class="poll-bar"><span style="width:${porcentagem}%"></span></div>
+                            <div class="poll-bar"><span style="width:${pct}%"></span></div>
                             ${enquete.voto === null ? `
                                 <button class="secondary small" data-votar="${enquete.id}" data-opcao="${indice}">
                                     Votar nesta opção
@@ -929,12 +816,7 @@ function renderizarEnquetes() {
     lista.querySelectorAll("[data-votar]").forEach(botao => {
         botao.addEventListener("click", () => {
             const enquete = enquetes.find(e => e.id === Number(botao.dataset.votar));
-            if (!enquete || enquete.voto !== null) return;
-
-
-            const indice = Number(botao.dataset.opcao);
-            enquete.opcoes[indice].votos++;
-            enquete.voto = indice;
+            if (!enquete || !votarUmaVez(enquete, Number(botao.dataset.opcao))) return;
 
 
             salvarDados();
