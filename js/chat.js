@@ -17,7 +17,8 @@ var el = {
   status: document.getElementById('statusGrupo'),
   mensagens: document.getElementById('mensagens'),
   formMsg: document.getElementById('formMensagem'),
-  texto: document.getElementById('campoMensagem')
+  texto: document.getElementById('campoMensagem'),
+  voltar: document.getElementById('voltarLista')
 };
 
 el.sair.addEventListener('click', sair);
@@ -289,6 +290,14 @@ el.formMsg.addEventListener('submit', async function (ev) {
 document.getElementById('novoChat').addEventListener('click', function () {
   abrirModal('chat');
   aplicarMascaraTelefone(document.getElementById('novo-telefone'));
+});
+
+el.voltar.addEventListener('click', function () {
+  conversaSelecionada = null;
+  el.app.classList.remove('em-conversa');
+  el.lista.querySelectorAll('.chat-contact.selected').forEach(function (botao) {
+    botao.classList.remove('selected');
+  });
 });
 
 document.getElementById('verInfo').addEventListener('click', function () {

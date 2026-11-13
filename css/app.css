@@ -425,6 +425,11 @@ button {
 }
 
 
+.voltar-lista {
+    display: none;
+}
+
+
 .icon-button {
     width: 35px;
     height: 35px;
@@ -1359,11 +1364,37 @@ dialog::backdrop {
         margin-left: 2px;
     }
 
-    /* Lista de conversas e título "CONVERSAS" não cabem no topo */
-    .sidebar > .sidebar-title,
-    .chat-list,
     .profile {
         display: none;
+    }
+
+    /* Conversas em duas telas: a lista, e a conversa aberta com botão de voltar */
+    .sidebar > .sidebar-title,
+    .chat-list {
+        display: none;
+    }
+
+    .app:not(.em-conversa):has(#view-chat.active) .sidebar > .sidebar-title {
+        display: block;
+        flex: 1 0 100%;
+        margin: 0;
+    }
+
+    .app:not(.em-conversa):has(#view-chat.active) .chat-list {
+        display: flex;
+        flex: 1 0 100%;
+        max-height: 45vh;
+        overflow-y: auto;
+    }
+
+    .app:not(.em-conversa) #view-chat .conversation {
+        display: none;
+    }
+
+    .voltar-lista {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* ---------- Área principal ---------- */
