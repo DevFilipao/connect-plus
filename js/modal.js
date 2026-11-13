@@ -155,9 +155,12 @@ formModal.addEventListener("submit", event => {
             texto("descricao")
         );
 
-        // Quadro da IA na conversa aberta, já marcado como salvo em Eventos
-        if (obterConversa()) {
-            publicarQuadro(compromisso, { conversaId: conversaAtual, salvo: true });
+        if (conversaSelecionada) {
+            publicarQuadro(compromisso, {
+                conversa: conversaSelecionada,
+                depoisDe: obterCache(conversaSelecionada).ultimoId,
+                salvo: true
+            });
         }
     }
 

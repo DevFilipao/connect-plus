@@ -107,12 +107,29 @@ async function selecionarConversa(c) {
   el.formMsg.hidden = false;
   if (el.app) el.app.classList.add('em-conversa');
   el.texto.focus();
+  esconderSugestao();
   pintarMensagens(obterCache(c).itens);
+  inserirQuadrosDaConversa(c.id);
 
   try {
     await buscarMensagens();
   } catch (e) {
     tratarErro(e);
+  }
+  if (conversaSelecionada === c) inserirQuadrosDaConversa(c.id, true);
+}
+
+function ultimaMensagemDaConversaAberta() {
+  if (!conversaSelecionada) return undefined;
+  var itens = obterCache(conversaSelecionada).itens;
+  return itens.length ? itens[itens.length - 1].texto : undefined;
+}
+
+function assistirEnvio(conv, texto) {
+  try {
+    analisarMensagem(texto, conv, obterCache(conv).ultimoId);
+  } catch (e) {
+    console.warn(e);
   }
 }
 
@@ -145,6 +162,7 @@ function renderizarMensagem(msg) {
 
   var linha = document.createElement('div');
   linha.className = 'message-row' + (minha ? ' mine' : '');
+  linha.dataset.id = msg.id;
 
 //    var avatar = document.createElement('div');
 //    avatar.className = 'message-avatar';
@@ -257,6 +275,7 @@ el.formMsg.addEventListener('submit', async function (ev) {
   try {
     await chamarApi('enviar', { token: sessao.token, conversaId: conv.id, texto: texto });
     await buscarMensagens();
+    assistirEnvio(conv, texto);
   } catch (e) {
     el.texto.value = texto; // devolve o texto para reenviar
     tratarErro(e);

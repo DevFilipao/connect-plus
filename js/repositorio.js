@@ -4,7 +4,8 @@ const CHAVES = {
     enquetes: "connect_enquetes",
     memoria: "connect_memoria",
     grupos: "connect_grupos",
-    conversas: "connect_conversas"
+    conversas: "connect_conversas",
+    quadros: "connect_quadros"
 };
 
 function criarRepositorio(storage) {
@@ -26,18 +27,24 @@ function criarRepositorio(storage) {
         carregarEventos: () => ler(CHAVES.eventos, []),
         carregarEnquetes: () => ler(CHAVES.enquetes, []),
         carregarGrupos: () => ler(CHAVES.grupos, []),
+        carregarMemoria: () => ler(CHAVES.memoria, []),
 
-        limparConversasEMemoria() {
-            storage.removeItem(CHAVES.conversas);
-            storage.removeItem(CHAVES.memoria);
+        carregarQuadros() {
+            const quadros = ler(CHAVES.quadros, {});
+            return quadros && typeof quadros === "object" && !Array.isArray(quadros) ? quadros : {};
         },
 
-        salvar({ tarefas, eventos, enquetes, memoria, grupos }) {
+        limparConversasAntigas() {
+            storage.removeItem(CHAVES.conversas);
+        },
+
+        salvar({ tarefas, eventos, enquetes, memoria, grupos, quadros }) {
             gravar(CHAVES.tarefas, tarefas);
             gravar(CHAVES.eventos, eventos);
             gravar(CHAVES.enquetes, enquetes);
             gravar(CHAVES.memoria, memoria);
             gravar(CHAVES.grupos, grupos);
+            gravar(CHAVES.quadros, quadros);
         }
     };
 }

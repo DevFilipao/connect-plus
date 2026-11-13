@@ -15,13 +15,14 @@ const CONVERSA_IA = {
 };
 
 
-repositorio.limparConversasEMemoria();
+repositorio.limparConversasAntigas();
 
 let conversas = [CONVERSA_IA, ...repositorio.carregarGrupos()];
 let tarefas = repositorio.carregarTarefas();
 let eventos = repositorio.carregarEventos();
 let enquetes = repositorio.carregarEnquetes();
-let memoria = [];
+let memoria = repositorio.carregarMemoria();
+let quadros = repositorio.carregarQuadros();
 
 
 let conversaAtual = CONVERSA_IA.id;
@@ -39,7 +40,8 @@ function salvarDados() {
         eventos,
         enquetes,
         memoria,
-        grupos: conversas.filter(c => c.tipo === "grupo")
+        grupos: conversas.filter(c => c.tipo === "grupo"),
+        quadros
     });
 }
 
@@ -282,7 +284,6 @@ function renderizarResumoAtividades() {
 
 function atualizarTudo() {
     salvarDados();
-    renderizarChat();
     renderizarTarefas();
     renderizarEventos();
     renderizarEnquetes();

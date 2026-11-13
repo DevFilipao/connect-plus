@@ -1,45 +1,45 @@
-function analisarMensagem(texto) {
+function analisarMensagem(texto, conversa, depoisDe = 0) {
     const tipo = classificarMensagem(texto);
+    const aberta = Boolean(conversaSelecionada) && conversaSelecionada.id === conversa.id;
 
+    if (aberta) esconderSugestao();
 
     if (tipo === "enquete") {
-        mostrarSugestao(
-            "enquete",
-            texto,
-            "Parece que vocês estão tentando tomar uma decisão. Que tal criar uma enquete?"
-        );
-    } else if (tipo === "evento") {
-        // A IA do Connect+ monta o quadro do compromisso direto no chat
-        sugestao.hidden = true;
-        sugestaoAtual = null;
-        publicarQuadro(extrairCompromisso(texto), { conversaId: conversaAtual });
-    } else if (tipo === "tarefa") {
-        mostrarSugestao(
-            "tarefa",
-            texto,
-            "Parece que essa mensagem contém uma tarefa ou algo importante para lembrar."
-        );
-    } else {
-        sugestao.hidden = true;
-        sugestaoAtual = null;
-    }
-
-
-    // Guarda mensagens que parecem conter informações importantes.
-    if (tipo) {
-        if (!memoria.some(item => item.texto === texto)) {
-            memoria.unshift({
-                id: gerarId(),
+        if (aberta) {
+            mostrarSugestao(
+                "enquete",
                 texto,
-                conversa: obterConversa()?.nome || "Conversa",
-                data: dataISO()
-            });
-
-
-            salvarDados();
-            renderizarResumoMemoria();
+                "Parece que vocês estão tentando tomar uma decisão. Que tal criar uma enquete?"
+            );
+        }
+    } else if (tipo === "evento") {
+        publicarQuadro(extrairCompromisso(texto), { conversa, depoisDe });
+    } else if (tipo === "tarefa") {
+        if (aberta) {
+            mostrarSugestao(
+                "tarefa",
+                texto,
+                "Parece que essa mensagem contém uma tarefa ou algo importante para lembrar."
+            );
         }
     }
+
+    if (tipo) guardarNaMemoria(texto, conversa.nome);
+}
+
+
+function guardarNaMemoria(texto, nomeConversa) {
+    if (memoria.some(item => item.texto === texto)) return;
+
+    memoria.unshift({
+        id: gerarId(),
+        texto,
+        conversa: nomeConversa || "Conversa",
+        data: dataISO()
+    });
+
+    salvarDados();
+    renderizarResumoMemoria();
 }
 
 
@@ -58,15 +58,17 @@ function mostrarSugestao(tipo, texto, descricao) {
 }
 
 
-document.getElementById("dispensarSugestao").addEventListener("click", () => {
+function esconderSugestao() {
     sugestao.hidden = true;
     sugestaoAtual = null;
-});
+}
+
+
+document.getElementById("dispensarSugestao").addEventListener("click", esconderSugestao);
 
 
 document.getElementById("criarAcao").addEventListener("click", () => {
-    const conversa = obterConversa();
-    const texto = sugestaoAtual?.texto || conversa?.mensagens.at(-1)?.texto;
+    const texto = sugestaoAtual?.texto || ultimaMensagemDaConversaAberta();
     const tipo = sugestaoAtual?.tipo || "tarefa";
 
 
@@ -86,6 +88,5 @@ document.getElementById("criarAcao").addEventListener("click", () => {
     }
 
 
-    sugestao.hidden = true;
-    sugestaoAtual = null;
+    esconderSugestao();
 });

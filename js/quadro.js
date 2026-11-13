@@ -1,9 +1,6 @@
 const OPCOES_QUADRO = ["Vou", "Talvez", "Não vou"];
 
-function publicarQuadro(compromisso, { conversaId, salvo = false } = {}) {
-    const conversa = conversas.find(c => c.id === conversaId);
-    if (!conversa) return;
-
+function publicarQuadro(compromisso, { conversa, depoisDe = 0, salvo = false }) {
     const quadro = {
         id: gerarId(),
         titulo: compromisso.titulo,
@@ -12,32 +9,25 @@ function publicarQuadro(compromisso, { conversaId, salvo = false } = {}) {
         local: compromisso.local || "",
         opcoes: criarOpcoes(OPCOES_QUADRO),
         voto: null,
-        salvo
+        salvo,
+        depoisDe
     };
 
     // Pequena pausa para parecer que a IA está organizando
     setTimeout(() => {
-        conversa.mensagens.push({
-            tipo: "quadro",
-            autor: "Connect+ IA",
-            texto: `📋 ${quadro.titulo}`,
-            hora: horaPtBR(),
-            minha: false,
-            quadro
-        });
-
+        quadro.hora = horaPtBR();
+        (quadros[conversa.id] = quadros[conversa.id] || []).push(quadro);
         salvarDados();
-        if (conversaAtual === conversa.id) renderizarChat();
+        if (conversaSelecionada && conversaSelecionada.id === conversa.id) inserirQuadro(quadro, true);
     }, 700);
 }
 
 
-function htmlQuadro(mensagem) {
-    const q = mensagem.quadro;
+function htmlQuadro(q) {
     const total = totalVotos(q.opcoes);
 
     return `
-        <div class="message-row ai-row">
+        <div class="message-row ai-row" data-quadro-linha="${q.id}">
             <div class="message-avatar ai-avatar">✦</div>
             <div class="message-content">
                 <div class="message-name">Connect+ IA</div>
@@ -65,21 +55,58 @@ function htmlQuadro(mensagem) {
                         ? `<div class="ai-board-saved">✓ Salvo em Eventos</div>`
                         : `<button type="button" class="secondary small" data-quadro-salvar="${q.id}">＋ Adicionar aos eventos</button>`}
                 </div>
-                <span class="message-time">${escaparHTML(mensagem.hora)}</span>
+                <span class="message-time">${escaparHTML(q.hora || "")}</span>
             </div>
         </div>
     `;
 }
 
 
-function acharQuadro(id) {
-    const conversa = obterConversa();
-    const mensagem = conversa?.mensagens.find(m => m.tipo === "quadro" && m.quadro.id === id);
-    return mensagem?.quadro;
+function criarLinhaQuadro(quadro) {
+    const molde = document.createElement("div");
+    molde.innerHTML = htmlQuadro(quadro).trim();
+    return molde.firstElementChild;
 }
 
 
-// Cliques nos quadros (votar e salvar em Eventos)
+function inserirQuadro(quadro, aoFinalSeSemAncora = false) {
+    if (mensagens.querySelector(`[data-quadro-linha="${quadro.id}"]`)) return;
+
+    const ancora = mensagens.querySelector(`.message-row[data-id="${quadro.depoisDe}"]`);
+    if (!ancora && quadro.depoisDe && !aoFinalSeSemAncora) return;
+
+    const noFim = mensagens.scrollHeight - mensagens.scrollTop - mensagens.clientHeight < 80;
+    const linha = criarLinhaQuadro(quadro);
+
+    if (ancora) {
+        let proxima = ancora.nextElementSibling;
+        while (proxima && proxima.dataset.quadroLinha) proxima = proxima.nextElementSibling;
+        mensagens.insertBefore(linha, proxima);
+    } else {
+        mensagens.appendChild(linha);
+    }
+
+    if (noFim) mensagens.scrollTop = mensagens.scrollHeight;
+}
+
+
+function inserirQuadrosDaConversa(conversaId, aoFinalSeSemAncora = false) {
+    (quadros[conversaId] || []).forEach(quadro => inserirQuadro(quadro, aoFinalSeSemAncora));
+}
+
+
+function atualizarLinhaQuadro(quadro) {
+    const atual = mensagens.querySelector(`[data-quadro-linha="${quadro.id}"]`);
+    if (atual) atual.replaceWith(criarLinhaQuadro(quadro));
+}
+
+
+function acharQuadro(id) {
+    if (!conversaSelecionada) return undefined;
+    return (quadros[conversaSelecionada.id] || []).find(q => q.id === id);
+}
+
+
 mensagens.addEventListener("click", event => {
     const votar = event.target.closest("[data-quadro]");
     const salvarEvento = event.target.closest("[data-quadro-salvar]");
@@ -88,10 +115,10 @@ mensagens.addEventListener("click", event => {
         const q = acharQuadro(Number(votar.dataset.quadro));
         if (!q) return;
 
-        alternarVoto(q, Number(votar.dataset.opcao)); // clicar de novo na mesma opção remove o voto
+        alternarVoto(q, Number(votar.dataset.opcao));
 
         salvarDados();
-        renderizarChat();
+        atualizarLinhaQuadro(q);
     }
 
     if (salvarEvento) {
@@ -100,6 +127,6 @@ mensagens.addEventListener("click", event => {
 
         q.salvo = true;
         adicionarEvento(q.titulo, q.data, q.horario, q.local);
-        renderizarChat();
+        atualizarLinhaQuadro(q);
     }
 });

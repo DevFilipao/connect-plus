@@ -15,7 +15,7 @@ const antes = (lista, a, b) => {
 };
 
 const FUNCIONALIDADES = [
-    "js/conversas.js", "js/quadro.js", "js/sugestao.js", "js/tarefas.js",
+    "js/quadro.js", "js/sugestao.js", "js/tarefas.js",
     "js/eventos.js", "js/enquetes.js", "js/memoria.js", "js/modal.js"
 ];
 
@@ -80,9 +80,8 @@ describe("login.html: ordem dos scripts", () => {
 
 test("cada módulo de funcionalidade foi carregado e define suas funções", async () => {
     const esperado = {
-        "js/conversas.js": ["renderizarChat"],
-        "js/quadro.js": ["publicarQuadro", "htmlQuadro", "acharQuadro"],
-        "js/sugestao.js": ["analisarMensagem", "mostrarSugestao"],
+        "js/quadro.js": ["publicarQuadro", "htmlQuadro", "inserirQuadro", "inserirQuadrosDaConversa", "acharQuadro"],
+        "js/sugestao.js": ["analisarMensagem", "mostrarSugestao", "esconderSugestao", "guardarNaMemoria"],
         "js/tarefas.js": ["adicionarTarefa", "renderizarTarefas"],
         "js/eventos.js": ["adicionarEvento", "renderizarEventos"],
         "js/enquetes.js": ["adicionarEnquete", "renderizarEnquetes"],

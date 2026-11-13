@@ -106,9 +106,11 @@ describe("tarefas", () => {
 });
 
 describe("eventos", () => {
-    test("criar pelo modal → salva, lista e publica quadro já salvo na conversa da IA", async () => {
+    test("criar pelo modal → salva, lista e publica quadro já salvo na conversa aberta", async () => {
         const p = await carregarApp();
         try {
+            p.clicar(p.$$("#listaConversas .chat-contact").find(b => b.textContent.includes("João Lima")));
+            await assentar();
             p.clicar("#novoEvento");
             preencherModal(p, { titulo: "Festa", data: "2026-12-20", horario: "21:00", local: "Clube", descricao: "Traje livre" });
             p.submeter("#formModal");
@@ -119,6 +121,20 @@ describe("eventos", () => {
             await esperar(800);
             assert.equal(p.$("#mensagens .ai-board h4").textContent, "Festa");
             assert.equal(p.$("#mensagens .ai-board-saved").textContent, "✓ Salvo em Eventos");
+            assert.deepEqual(Object.keys(p.lerLocal("connect_quadros")), ["10"]);
+        } finally { p.fechar(); }
+    });
+
+    test("criar pelo modal sem nenhuma conversa aberta salva o evento e não publica quadro", async () => {
+        const p = await carregarApp();
+        try {
+            p.clicar("#novoEvento");
+            preencherModal(p, { titulo: "Festa", data: "2026-12-20" });
+            p.submeter("#formModal");
+            await esperar(800);
+            assert.equal(p.lerLocal("connect_eventos").length, 1);
+            assert.equal(p.$$("#mensagens .ai-board").length, 0);
+            assert.deepEqual(p.lerLocal("connect_quadros"), {});
         } finally { p.fechar(); }
     });
 
@@ -169,10 +185,20 @@ describe("enquetes", () => {
 });
 
 describe("memória", () => {
-    test("BUG CONHECIDO D6: memória salva antes é apagada ao carregar (app.js:48-49)", async () => {
-        const p = await carregarApp({ local: { connect_memoria: [{ id: 1, texto: "Prova sexta", conversa: "X", data: "2026-11-01" }] } });
+    test("memória salva antes é carregada e mostrada", async () => {
+        const memoria = [{ id: 1, texto: "Prova sexta", conversa: "X", data: "2026-11-01" }];
+        const p = await carregarApp({ local: { connect_memoria: memoria } });
         try {
-            assert.deepEqual(p.lerLocal("connect_memoria"), []);
+            assert.deepEqual(p.lerLocal("connect_memoria"), memoria);
+            assert.match(p.$("#listaMemoria").textContent, /Prova sexta/);
+            assert.match(p.$("#listaMemoria").textContent, /01\/11\/2026/);
+            assert.deepEqual(p.$$("#resumoMemoria .memory-mini").map(e => e.textContent), ["Prova sexta"]);
+        } finally { p.fechar(); }
+    });
+
+    test("sem memória salva, as telas mostram o estado vazio", async () => {
+        const p = await carregarApp();
+        try {
             assert.match(p.$("#listaMemoria").textContent, /Sua memória está vazia/);
             assert.match(p.$("#resumoMemoria").textContent, /Nenhuma informação guardada ainda/);
         } finally { p.fechar(); }
@@ -236,20 +262,36 @@ describe("modal e cabeçalho", () => {
         } finally { p.fechar(); }
     });
 
-    test("BUG CONHECIDO D5: criar tarefa com conversa da API aberta troca o painel pela conversa da IA", async () => {
+    test("criar tarefa ou evento com uma conversa aberta não troca o painel da conversa", async () => {
         const p = await carregarApp();
         try {
-            const joao = p.$$("#listaConversas .chat-contact").find(b => b.textContent.includes("João Lima"));
-            p.clicar(joao);
+            p.clicar(p.$$("#listaConversas .chat-contact").find(b => b.textContent.includes("João Lima")));
             await assentar();
-            assert.equal(p.$$("#mensagens .message-bubble").length, 1);
+            assert.deepEqual(p.$$("#mensagens .message-bubble").map(b => b.textContent), ["Oi, Maria!"]);
 
             p.clicar("#novaTarefa");
             preencherModal(p, { titulo: "Algo" });
             p.submeter("#formModal");
 
+            assert.equal(p.$("#nomeGrupo").textContent, "João Lima");
+            assert.equal(p.$("#avatarGrupo").textContent, "J");
+            assert.deepEqual(p.$$("#mensagens .message-bubble").map(b => b.textContent), ["Oi, Maria!"]);
+
+            p.clicar("#novoEvento");
+            preencherModal(p, { titulo: "Festa", data: "2026-12-20" });
+            p.submeter("#formModal");
+            assert.equal(p.$("#nomeGrupo").textContent, "João Lima");
+            assert.equal(p.$$("#mensagens .message-bubble").length, 1);
+        } finally { p.fechar(); }
+    });
+
+    test("cabeçalho inicial, antes de abrir uma conversa, é o da IA", async () => {
+        const p = await carregarApp();
+        try {
             assert.equal(p.$("#nomeGrupo").textContent, "CONNECT+ AI");
-            assert.equal(p.$$("#mensagens .message-bubble").length, 0);
+            assert.equal(p.$("#avatarGrupo").textContent, "C+");
+            assert.equal(p.$("#statusGrupo").textContent, "Chat privado com a IA");
+            assert.equal(p.$("#adicionarParticipantes").hidden, true);
         } finally { p.fechar(); }
     });
 });
