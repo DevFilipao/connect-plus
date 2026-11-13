@@ -21,7 +21,7 @@ function carregarDados(chave, padrao) {
     }
 }
 
-// Usuário criado na página de cadastro (index.html)
+// Usuário criado na página de cadastro (login.html)
 const usuario = carregarDados("connect_usuario", null);
 const nomeUsuario = (usuario && usuario.nome ? usuario.nome.trim().split(" ")[0] : "") || "Maria";
 

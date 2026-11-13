@@ -1,4 +1,4 @@
-// Login, cadastro e saída. Usado em login.html, register.html e chat.html.
+// Login, cadastro e saída. Usado em login.html e app.html.
 function exigirLogin() {
   var s = Sessao.ler();
   if (!s || !s.token) {
