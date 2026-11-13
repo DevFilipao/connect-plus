@@ -254,6 +254,53 @@ describe("modal e cabeçalho", () => {
     });
 });
 
+describe("dados salvos por versões anteriores", () => {
+    const TAREFAS = [{ id: 1, titulo: "Estudar", descricao: "", data: "", concluida: false }];
+    const EVENTOS = [{ id: 2, titulo: "Festa", data: "2026-12-20", horario: "21:00", local: "Clube", descricao: "" }];
+    const ENQUETES = [{ id: 3, pergunta: "Qual dia?", opcoes: [{ texto: "Sábado", votos: 1 }, { texto: "Domingo", votos: 0 }], voto: 0 }];
+    const GRUPOS = [{ id: 4, tipo: "grupo", nome: "Futsal", avatar: "F", descricao: "Grupo · 2 participantes", membros: [], mensagens: [] }];
+    const LEGADO = { connect_tarefas: TAREFAS, connect_eventos: EVENTOS, connect_enquetes: ENQUETES, connect_grupos: GRUPOS };
+
+    test("são lidos e desenhados nas três telas", async () => {
+        const p = await carregarApp({ local: LEGADO });
+        try {
+            assert.deepEqual(textos(p, "#listaTarefas .task-details strong"), ["Estudar"]);
+            assert.deepEqual(textos(p, "#listaEventos h3"), ["Festa"]);
+            assert.match(p.$("#listaEnquetes").textContent, /Qual dia\?/);
+            assert.match(p.$("#listaEnquetes").textContent, /1 voto\(s\)/);
+        } finally { p.fechar(); }
+    });
+
+    test("uma gravação nova mantém o formato das demais chaves, sem migração", async () => {
+        const p = await carregarApp({ local: LEGADO });
+        try {
+            p.clicar("#novaTarefa");
+            preencherModal(p, { titulo: "Nova" });
+            p.submeter("#formModal");
+            assert.equal(p.window.localStorage.getItem("connect_eventos"), JSON.stringify(EVENTOS));
+            assert.equal(p.window.localStorage.getItem("connect_enquetes"), JSON.stringify(ENQUETES));
+            assert.equal(p.window.localStorage.getItem("connect_grupos"), JSON.stringify(GRUPOS));
+            assert.equal(p.lerLocal("connect_tarefas").length, 2);
+        } finally { p.fechar(); }
+    });
+
+    test("dados corrompidos viram lista vazia e a página carrega", async () => {
+        const p = await carregarApp({ local: { connect_tarefas: "{quebrado", connect_eventos: "x" } });
+        try {
+            assert.deepEqual(p.erros.map(e => e.message), []);
+            assert.match(p.$("#listaTarefas").textContent, /Nenhuma tarefa por enquanto/);
+            assert.match(p.$("#listaEventos").textContent, /Nenhum evento cadastrado/);
+        } finally { p.fechar(); }
+    });
+
+    test("o repositório chega à página como global (ordem dos scripts em app.html)", async () => {
+        const p = await carregarApp();
+        try {
+            assert.equal(typeof p.window.criarRepositorio, "function");
+        } finally { p.fechar(); }
+    });
+});
+
 describe("utilitários de app.js", () => {
     test("gerarId devolve número baseado em Date.now()", async () => {
         const p = await carregarApp();

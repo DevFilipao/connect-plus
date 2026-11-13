@@ -10,16 +10,7 @@ const modalCampos = document.getElementById("modalCampos");
 const formModal = document.getElementById("formModal");
 
 
-// DADOS SALVOS NO NAVEGADOR
-
-function carregarDados(chave, padrao) {
-    try {
-        const dados = localStorage.getItem(chave);
-        return dados ? JSON.parse(dados) : padrao;
-    } catch {
-        return padrao;
-    }
-}
+const repositorio = criarRepositorio(localStorage);
 
 // Usuário logado (sessão salva em js/storage.js)
 const usuario = Sessao.ler();
@@ -35,18 +26,13 @@ const CONVERSA_IA = {
 };
 
 
-// O chat com a IA sempre começa vazio ao entrar
-localStorage.removeItem("connect_conversas");
+repositorio.limparConversasEMemoria();
 
-// Os grupos criados continuam salvos no navegador
-const gruposSalvos = carregarDados("connect_grupos", []);
-let conversas = [CONVERSA_IA, ...gruposSalvos];
-
-let tarefas = carregarDados("connect_tarefas", []);
-let eventos = carregarDados("connect_eventos", []);
-let enquetes = carregarDados("connect_enquetes", []);
+let conversas = [CONVERSA_IA, ...repositorio.carregarGrupos()];
+let tarefas = repositorio.carregarTarefas();
+let eventos = repositorio.carregarEventos();
+let enquetes = repositorio.carregarEnquetes();
 let memoria = [];
-localStorage.removeItem("connect_memoria");
 
 
 let conversaAtual = CONVERSA_IA.id;
@@ -59,15 +45,13 @@ let contatosGrupo = []; // contatos adicionados no modal "Novo grupo"
 
 
 function salvarDados() {
-
-    localStorage.setItem("connect_tarefas", JSON.stringify(tarefas));
-    localStorage.setItem("connect_eventos", JSON.stringify(eventos));
-    localStorage.setItem("connect_enquetes", JSON.stringify(enquetes));
-    localStorage.setItem("connect_memoria", JSON.stringify(memoria));
-    localStorage.setItem(
-        "connect_grupos",
-        JSON.stringify(conversas.filter(c => c.tipo === "grupo"))
-    );
+    repositorio.salvar({
+        tarefas,
+        eventos,
+        enquetes,
+        memoria,
+        grupos: conversas.filter(c => c.tipo === "grupo")
+    });
 }
 
 

@@ -7,6 +7,7 @@
 process.env.TZ = "America/Sao_Paulo";
 
 const fs = require("node:fs");
+const { after } = require("node:test");
 const path = require("node:path");
 const { JSDOM, VirtualConsole, requestInterceptor } = require("jsdom");
 const LocationImpl = require("jsdom/lib/jsdom/living/window/Location-impl.js").implementation;
@@ -141,6 +142,7 @@ async function carregarPagina(arquivo, opcoes = {}) {
 
     await carregou;
     const { window } = dom;
+    paginasAbertas.add(window);
 
     return {
         dom,
@@ -170,9 +172,19 @@ async function carregarPagina(arquivo, opcoes = {}) {
             el.value = valor;
             el.dispatchEvent(new window.Event("input", { bubbles: true }));
         },
-        fechar: () => window.close()
+        fechar: () => {
+            paginasAbertas.delete(window);
+            window.close();
+        }
     };
 }
+
+const paginasAbertas = new Set();
+
+after(() => {
+    for (const janela of paginasAbertas) janela.close();
+    paginasAbertas.clear();
+});
 
 const esperar = ms => new Promise(resolve => setTimeout(resolve, ms));
 

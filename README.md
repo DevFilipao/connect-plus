@@ -95,6 +95,7 @@ connect-plus/
     │   ├── assistente.js   classifica a mensagem: enquete, evento, tarefa ou nada
     │   └── votacao.js      regras de voto do quadro e das enquetes
     ├── storage.js  sessão no navegador
+    ├── repositorio.js  leitura e gravação dos dados do app (tarefas, eventos, enquetes, grupos)
     ├── api.js      chamadas ao Apps Script
     ├── auth.js     login, cadastro e saída
     ├── chat.js     conversas ligadas à API
